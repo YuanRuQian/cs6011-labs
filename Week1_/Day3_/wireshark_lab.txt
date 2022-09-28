@@ -1,0 +1,100 @@
+
+My IPv4 address:
+10.17.244.119
+
+My partner's IPv4 address:
+10.17.139.118
+
+Ping my partner's IPv4 address:
+
+ping -c 4 10.17.139.118
+PING 10.17.139.118 (10.17.139.118): 56 data bytes
+64 bytes from 10.17.139.118: icmp_seq=0 ttl=64 time=15.793 ms
+64 bytes from 10.17.139.118: icmp_seq=1 ttl=64 time=8.305 ms
+64 bytes from 10.17.139.118: icmp_seq=2 ttl=64 time=7.696 ms
+64 bytes from 10.17.139.118: icmp_seq=3 ttl=64 time=8.307 ms
+
+--- 10.17.139.118 ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 7.696/10.025/15.793/3.339 ms
+
+There are 4 pairs of ICMP requests & replies
+
+The data:
+0000   08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17   ................
+0010   18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27   ........ !"#$%&'
+0020   28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37   ()*+,-./01234567
+
+The source IP in the request: 10.17.244.119 ( my IP )
+The destination IP in the reply: 10.17.139.118 ( my partner's IP )
+
+The source IP in the reply: 10.17.139.118 ( my IP )
+The destination IP in the request: 10.17.244.119 ( my partner's IP )
+
+The integer values are the hex values of the ASCII that is displayed in the terminal
+
+The !"#$%&'()*+,-./01234567 is ASCII code from 21 to 37
+
+Ping Google:
+
+ping -c 4 www.google.com
+PING www.google.com (142.250.189.228): 56 data bytes
+64 bytes from 142.250.189.228: icmp_seq=0 ttl=56 time=18.997 ms
+64 bytes from 142.250.189.228: icmp_seq=1 ttl=56 time=20.477 ms
+64 bytes from 142.250.189.228: icmp_seq=2 ttl=56 time=22.930 ms
+64 bytes from 142.250.189.228: icmp_seq=3 ttl=56 time=40.417 ms
+
+--- www.google.com ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 18.997/25.705/40.417/8.609 ms
+
+Ping Louvre's official website:
+
+ping -c 4 www.louvre.fr
+ping www.louvre.fr (89.185.38.196): 56 data bytes
+64 bytes from 89.185.38.196: icmp_seq=0 ttl=232 time=138.889 ms
+64 bytes from 89.185.38.196: icmp_seq=1 ttl=232 time=139.401 ms
+64 bytes from 89.185.38.196: icmp_seq=2 ttl=232 time=139.106 ms
+64 bytes from 89.185.38.196: icmp_seq=3 ttl=232 time=139.959 ms
+
+--- www.louvre.fr ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 138.889/139.339/139.959/0.402 ms
+
+It turns out that Google is faster for us to reach than Louvre's official website
+
+"stddev" stands for standard deviation so Louvre's official website is more stable to reach than Google
+
+
+Watch the traffic of example.com
+
+Unexpected:
+
+The HTTP transferred data is not what is displayed on the screen
+
+>S
+VT¦\E\*EyªW@7ePýÊ
+PÁ}ÓK}c÷þº¸
+ÓjXt|¬<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>
+
+On the screen it says "Example domain ......"
+
+Other data sent/received:
+- DNS: reply with the IPv6 / 4 address
+- ARP: ask & answer where the IP is located 
+
+
+Watch curl example.com:
+
+Difference between curl & using a web browser:
+There are two pairs of DNS when using a web browser but only one pair using curl
+Web browser will have an extra 75.75.75.75 request
+
+
+Go to http://github.com in Safari:
+
+It automatically goes to the https version of GitHub: https://github.com
+
+The HTTP transferred data is not what is displayed on the screen:
+<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>
+

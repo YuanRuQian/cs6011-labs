@@ -1,0 +1,6 @@
+
+the project repo: https://github.com/YuanRuQian/writing-html-remotely
+
+the GitHub page: https://yuanruqian.github.io/writing-html-remotely/
+
+the page on CS department remote machine: https://yuanruqian.github.io/writing-html-remotely/ 
