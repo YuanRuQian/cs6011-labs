@@ -1,8 +1,9 @@
+import org.junit.jupiter.api.Test;
+
 import java.io.FileNotFoundException;
 
 class RainDataTest {
-	
-	@org.junit.jupiter.api.Test
+	@Test
 	void testAtlanta() throws FileNotFoundException {
 		String atlantaUrl = RainData.getCurrentDirectory() + "/src/Atlanta.txt";
 		RainData atlanta = new RainData(atlantaUrl);
@@ -10,7 +11,7 @@ class RainDataTest {
 		atlanta.outputResults();
 	}
 	
-	@org.junit.jupiter.api.Test
+	@Test
 	void testMacon() throws FileNotFoundException {
 		String atlantaUrl = RainData.getCurrentDirectory() + "/src/Macon.txt";
 		RainData atlanta = new RainData(atlantaUrl);

@@ -68,7 +68,7 @@ public class RainData {
 			sum += monthToAmount.getOrDefault(month, 0.0);
 		}
 		String roundedAmount = df2.format(sum / sortedMonth.length);
-		return "The overall average rainfall amount is " + roundedAmount + " inches.";
+		return "The overall average rainfall amount for each month is " + roundedAmount + " inches.";
 	}
 	
 	public void outputResults() throws FileNotFoundException {
