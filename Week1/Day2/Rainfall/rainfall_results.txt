@@ -1,14 +1,14 @@
-City: Atlanta
-The overall average rainfall amount for each month is 4.02 inches.
-The average rainfall amount for January is 4.30 inches.
-The average rainfall amount for February is 4.23 inches.
-The average rainfall amount for March is 4.80 inches.
-The average rainfall amount for April is 3.58 inches.
-The average rainfall amount for May is 3.59 inches.
-The average rainfall amount for June is 4.28 inches.
-The average rainfall amount for July is 4.36 inches.
-The average rainfall amount for August is 4.08 inches.
-The average rainfall amount for September is 3.80 inches.
-The average rainfall amount for October is 2.76 inches.
-The average rainfall amount for November is 3.73 inches.
-The average rainfall amount for December is 4.69 inches.
+City: Macon
+The overall average rainfall amount for each month is 3.79 inches.
+The average rainfall amount for January is 3.65 inches.
+The average rainfall amount for February is 4.17 inches.
+The average rainfall amount for March is 4.14 inches.
+The average rainfall amount for April is 3.36 inches.
+The average rainfall amount for May is 2.57 inches.
+The average rainfall amount for June is 4.70 inches.
+The average rainfall amount for July is 4.24 inches.
+The average rainfall amount for August is 4.16 inches.
+The average rainfall amount for September is 4.30 inches.
+The average rainfall amount for October is 2.13 inches.
+The average rainfall amount for November is 3.33 inches.
+The average rainfall amount for December is 4.70 inches.
