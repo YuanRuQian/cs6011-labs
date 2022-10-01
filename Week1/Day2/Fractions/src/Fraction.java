@@ -27,6 +27,9 @@ public class Fraction {
 	}
 	
 	public Fraction(long n, long d) {
+		if (d == 0) {
+			throw new ArithmeticException("Failed: fraction divided by zero");
+		}
 		numerator = n;
 		denominator = d;
 		reduce();
