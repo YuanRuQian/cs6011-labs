@@ -1,4 +1,10 @@
-public class Fraction {
+interface Comparable
+{
+	Double compareTo(Fraction rhs);
+}
+
+
+public class Fraction implements Comparable {
 	private long numerator;
 	private long denominator;
 	
@@ -72,4 +78,8 @@ public class Fraction {
 		return (double) numerator / denominator;
 	}
 	
+	@Override
+	public Double compareTo(Fraction rhs) {
+		return toDouble() - rhs.toDouble();
+	}
 }
