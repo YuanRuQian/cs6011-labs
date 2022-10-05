@@ -15,7 +15,6 @@ public class SineWave implements AudioComponent {
 	
 	@Override
 	public AudioClip getClip() {
-		System.out.println("sine wave get clip " + audioClip.getSample(42));
 		return audioClip;
 	}
 	@Override
