@@ -30,10 +30,10 @@ public class AudioClip {
 	// In other words, for the value of sample i
 	// the lower 8 bits should be stored at array[ 2*i ]
 	// the upper 8 bits should be stored at array[ (2*i) + 1 ].
-	public int getSample(int index) {
+	public short getSample(int index) {
 		byte lower8bits = data[2 * index];
 		byte higher8bits = data[2 * index + 1];
-		return (higher8bits << 8) | (lower8bits & 0xff);
+		return (short) ((higher8bits << 8) | (lower8bits & 0xff));
 	}
 	
 	public void setSample(int index, Short value) {

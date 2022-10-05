@@ -27,7 +27,7 @@ public class ReverbFilter implements AudioComponent {
 					sample = Short.MIN_VALUE;
 				}
 			}
-			result.setSample(index, sample);
+			result.setSample((index + delay) % AudioClip.TOTAL_SAMPLES, sample);
 		}
 		return result;
 	}

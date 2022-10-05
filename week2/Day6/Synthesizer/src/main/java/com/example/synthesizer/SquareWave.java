@@ -10,7 +10,7 @@ public class SquareWave implements AudioComponent {
 		this.frequency = frequency;
 		// prevent -Short.MIN_VALUE overflow => Short.MIN_VALUE
 		this.maxVal = (short) Math.max(Short.MIN_VALUE + 1, maxVal);
-		audioClip = new AudioClip();
+		this.audioClip = new AudioClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			short sample;
 			if (((double) frequency * i / AudioClip.rate) % 1 > 0.5) {
@@ -18,7 +18,7 @@ public class SquareWave implements AudioComponent {
 			} else {
 				sample = (short) -this.maxVal;
 			}
-			audioClip.setSample(i, sample);
+			this.audioClip.setSample(i, sample);
 		}
 	}
 	
