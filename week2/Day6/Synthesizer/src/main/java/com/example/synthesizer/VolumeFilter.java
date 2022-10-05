@@ -1,11 +1,11 @@
 package com.example.synthesizer;
 
-public class Filter implements AudioComponent {
+public class VolumeFilter implements AudioComponent {
 	private AudioComponent input;
 	private double scale;
 	private boolean clamping;
 	
-	public Filter(AudioComponent audioComponent, double scale, boolean clamping)
+	public VolumeFilter(AudioComponent audioComponent, double scale, boolean clamping)
 	{
 		this.input = audioComponent;
 		this.scale = scale;

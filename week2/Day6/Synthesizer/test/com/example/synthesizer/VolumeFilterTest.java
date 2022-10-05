@@ -1,24 +1,20 @@
 package com.example.synthesizer;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-
 import static javax.sound.sampled.AudioSystem.getClip;
 
-class FilterTest {
+class VolumeFilterTest {
 	public static void main(String[] args) {
-		hearAFilteredSineWave();
+		hearAVolumeFilteredSineWave();
 	}
 	
-	static void hearAFilteredSineWave() {
+	static void hearAVolumeFilteredSineWave() {
 		int frequency = 420;
 		AudioComponent gen = new SineWave(frequency); // Your code
 		
 		AudioClip clip = gen.getClip();
 		PlayAudioClip.play(clip, "unfiltered clip", 1);
 		
-		AudioClip filteredClip = new Filter(gen, 0.42, true).getClip();
+		AudioClip filteredClip = new VolumeFilter(gen, 0.42, true).getClip();
 		PlayAudioClip.play(filteredClip, "filtered clip", 1);
 	}
 }

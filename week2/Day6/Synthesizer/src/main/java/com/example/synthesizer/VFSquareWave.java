@@ -1,12 +1,12 @@
 package com.example.synthesizer;
 
-public class VFSineWave extends LinearRamp implements AudioComponent {
+public class VFSquareWave extends LinearRamp implements AudioComponent {
 	
 	private AudioClip audioClip;
 	
 	private boolean clamping;
 	
-	VFSineWave(boolean clamping)
+	VFSquareWave(boolean clamping)
 	{
 		this.audioClip = new AudioClip();
 		this.clamping = clamping;
@@ -15,7 +15,7 @@ public class VFSineWave extends LinearRamp implements AudioComponent {
 	}
 	
 	
-	VFSineWave(float start, float end, boolean clamping)
+	VFSquareWave(float start, float end, boolean clamping)
 	{
 		this.start = start;
 		this.end = end;
@@ -28,6 +28,8 @@ public class VFSineWave extends LinearRamp implements AudioComponent {
 	private void setUpAudioClip(float[] floats)
 	{
 		float phase = 0;
+		
+		
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			phase += 2 * Math.PI * floats[ i ] / AudioClip.rate;
 			double sample =  Short.MAX_VALUE * Math.sin( phase);

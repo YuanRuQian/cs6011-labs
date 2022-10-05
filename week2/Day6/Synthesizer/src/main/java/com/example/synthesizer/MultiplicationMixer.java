@@ -1,10 +1,10 @@
 package com.example.synthesizer;
 
-public class Mixer implements AudioComponent {
+public class MultiplicationMixer implements AudioComponent {
 	private final AudioClip result;
 	private final boolean clamping;
 	
-	public Mixer(boolean clamping) {
+	public MultiplicationMixer(boolean clamping) {
 		this.result = new AudioClip();
 		this.clamping = clamping;
 	}
@@ -24,7 +24,7 @@ public class Mixer implements AudioComponent {
 		//  adds new input signal to update the output
 		AudioClip audioClip = input.getClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			int currentSum = audioClip.getSample(i) + result.getSample(i);
+			int currentSum = audioClip.getSample(i) * result.getSample(i);
 			if (clamping) {
 				if (currentSum > Short.MAX_VALUE) {
 					currentSum = Short.MAX_VALUE;
