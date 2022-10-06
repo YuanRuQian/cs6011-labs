@@ -3,33 +3,41 @@ package com.example.synthesizer;
 import javax.sound.sampled.Clip;
 
 public class GlobalSoundManager {
-	public static Clip globalClip;
-	public static int frequency;
-	public static AudioClip audioClip;
-	GlobalSoundManager()
+	public static Clip globalClip = null;
+	private static int frequency = 400;
+	private static int volume = 100;
+	
+	// set default audioComponent to prevent NullException
+	private static AudioComponentWidgetBase currentActiveAudioComponent = new SineWaveWidget();
+	
+	public static int getVolume()
 	{
-		this.globalClip = null;
-		this.frequency = 440;
-		this.audioClip = null;
+		return volume;
 	}
 	
+	public static int getFrequency()
+	{
+		return frequency;
+	}
+	
+	public static AudioComponentWidgetBase getCurrentActiveAudioComponent()
+	{
+		return currentActiveAudioComponent;
+	}
 	public static void updateFrequency(int newFrequency)
 	{
 		frequency = newFrequency;
+		currentActiveAudioComponent.updateFrequencyText();
 	}
 	
-	public static  void updateAudioClip(AudioClip newAudioClip)
+	public static void updateVolume(int newVolume)
 	{
-		audioClip = newAudioClip;
+		volume = newVolume;
+		currentActiveAudioComponent.updateVolumeText();
 	}
 	
-	public static void playAudio()
+	public static void updateCurrentActiveAudioComponent(AudioComponentWidgetBase input)
 	{
-		globalClip.start();
-	}
-	
-	public static void endAudio()
-	{
-		globalClip.close();
+		currentActiveAudioComponent = input;
 	}
 }

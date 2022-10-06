@@ -1,7 +1,5 @@
 package com.example.synthesizer;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class VFSineWaveTest {
 	public static void main(String[] args) {
 		hearASineWaveGeneratedByDefaultVF();
@@ -9,14 +7,16 @@ class VFSineWaveTest {
 	}
 	
 	static void hearASineWaveGeneratedByDefaultVF() {
-		VFSineWave vfSineWave = new VFSineWave(true);
-		AudioClip audioClip = vfSineWave.getClip();
-		PlayAudioClip.play(audioClip,"default VF",1);
+		LinearRamp linearRamp = new LinearRamp(50, 2000);
+		VFSineWave vfSineWave = new VFSineWave();
+		vfSineWave.connectInput(linearRamp);
+		PlayAudioClip.play(vfSineWave.getClip(),"default VF",1);
 	}
 	
 	static void hearASineWaveGeneratedByCustomVF() {
-		VFSineWave vfSineWave = new VFSineWave(50, 10000,true);
-		AudioClip audioClip = vfSineWave.getClip();
-		PlayAudioClip.play(audioClip,"custom VF",1);
+		LinearRamp linearRamp = new LinearRamp(50, 10000);
+		VFSineWave vfSineWave = new VFSineWave();
+		vfSineWave.connectInput(linearRamp);
+		PlayAudioClip.play(vfSineWave.getClip(),"default VF",1);
 	}
 }

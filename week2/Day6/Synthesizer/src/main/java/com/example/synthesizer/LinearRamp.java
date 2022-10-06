@@ -2,28 +2,61 @@ package com.example.synthesizer;
 
 import java.util.Arrays;
 
-public class LinearRamp {
+public class LinearRamp implements AudioComponent {
 	public float start;
 	public float end;
-	private float[] samples = new float[AudioClip.TOTAL_SAMPLES];
+	private boolean clamping;
+	private AudioClip audioClip;
 	
-	LinearRamp() {
-		this.start = 50;
-		this.end = 2000;
+	LinearRamp(boolean clamping) {
+		start = 50;
+		end = 2000;
+		this.clamping = clamping;
+		this.audioClip = new AudioClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			samples[i] = (start * (AudioClip.TOTAL_SAMPLES - i) + end * i) / AudioClip.TOTAL_SAMPLES;
+			short sample = getProcessedSample((start * (AudioClip.TOTAL_SAMPLES - i) + end * i) / AudioClip.TOTAL_SAMPLES);
+			audioClip.setSample(i, sample);
 		}
 	}
 	
 	LinearRamp(float start, float end) {
 		this.start = start;
 		this.end = end;
+		this.audioClip = new AudioClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			samples[i] = (start * (AudioClip.TOTAL_SAMPLES - i) + end * i) / AudioClip.TOTAL_SAMPLES;
+			short sample = getProcessedSample((start * (AudioClip.TOTAL_SAMPLES - i) + end * i) / AudioClip.TOTAL_SAMPLES);
+			audioClip.setSample(i, sample);
 		}
 	}
 	
-	float[] getSamples() {
-		return Arrays.copyOf(samples, AudioClip.TOTAL_SAMPLES);
+	private short getProcessedSample(float num)
+	{
+		float sample = num;
+		if(clamping)
+		{
+			if(sample > Short.MAX_VALUE)
+			{
+				sample = Short.MAX_VALUE;
+			} else if (sample < Short.MIN_VALUE) {
+				sample = Short.MIN_VALUE;
+			}
+		}
+		return (short) sample;
+	}
+	
+	
+	@Override
+	public AudioClip getClip() {
+		return audioClip;
+	}
+	
+	@Override
+	public boolean hasInput() {
+		return false;
+	}
+	
+	@Override
+	public void connectInput(AudioComponent input) {
+		assert hasInput();
 	}
 }
