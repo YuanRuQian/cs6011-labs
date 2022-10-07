@@ -1,10 +1,10 @@
 package com.example.synthesizer;
 
 public class ReverbFilter implements AudioComponent {
-	private AudioComponent input;
-	private double scale;
-	private short delay;
-	private boolean clamping;
+	private final AudioComponent input;
+	private final double scale;
+	private final short delay;
+	private final boolean clamping;
 	
 	public ReverbFilter(AudioComponent audioComponent, double scale, short delay, boolean clamping) {
 		this.input = audioComponent;

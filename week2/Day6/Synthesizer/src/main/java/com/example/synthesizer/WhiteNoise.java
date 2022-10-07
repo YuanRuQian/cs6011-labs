@@ -4,11 +4,9 @@ import java.util.Random;
 
 public class WhiteNoise implements AudioComponent {
 	
-	private AudioClip audioClip;
-	private int frequency;
+	private final AudioClip audioClip;
 	
-	public WhiteNoise(int frequency) {
-		this.frequency = frequency;
+	public WhiteNoise() {
 		audioClip = new AudioClip();
 		Random random = new Random(System.currentTimeMillis());
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {

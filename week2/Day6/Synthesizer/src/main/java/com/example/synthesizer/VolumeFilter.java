@@ -1,9 +1,9 @@
 package com.example.synthesizer;
 
 public class VolumeFilter implements AudioComponent {
-	private AudioComponent input;
-	private double scale;
-	private boolean clamping;
+	private final AudioComponent input;
+	private final double scale;
+	private final boolean clamping;
 	
 	public VolumeFilter(AudioComponent audioComponent, double scale, boolean clamping)
 	{
@@ -38,6 +38,6 @@ public class VolumeFilter implements AudioComponent {
 	
 	@Override
 	public void connectInput(AudioComponent input) {
-	
+		assert !hasInput();
 	}
 }

@@ -2,40 +2,39 @@ package com.example.synthesizer;
 
 public class SawToothWave implements AudioComponent {
 	
-	private AudioClip audioClip;
-	private int frequency;
+	private final AudioClip audioClip;
+	private final int frequency;
+	
+	public SawToothWave() {
+		this.frequency = (int) AudioComponentWidget.getDefaultFrequency();
+		audioClip = new AudioClip();
+		short[] samples = generateWaveWithFrequency();
+		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
+			audioClip.setSample(i, samples[i]);
+		}
+	}
 	
 	public SawToothWave(int frequency) {
 		this.frequency = frequency;
 		audioClip = new AudioClip();
-		short[] samples = generateWaveForm(20);
+		short[] samples = generateWaveWithFrequency();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			audioClip.setSample(i, samples[i]);
-			System.out.println(audioClip.getSample(i));
 		}
 	}
 	
-	// reference: https://stackoverflow.com/a/59437685
-	public short[] generateWaveForm(int N) {
+	public short[] generateWaveWithFrequency() {
 		short[] samples = new short[AudioClip.TOTAL_SAMPLES];
+		double phase = 0.0;
+		double phaseDelta = (double) this.frequency / AudioClip.getRate();
+		// phase : [0.0, 1.0]
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			short sample = (short) ((double) Short.MAX_VALUE * 8.0 / Math.pow(Math.PI, 2.0) * getDataPoint(i, N));
-			samples[i] = sample;
+			phase += phaseDelta;
+			if (phase > 1.0)
+				phase -= 1.0;
+			samples[i] = ShortClampingHelper.getClampedShort(phase * Short.MAX_VALUE);
 		}
 		return samples;
-	}
-	
-	private double getDataPoint(int t, int N) {
-		double sum = 0;
-		for (int i = 0; i <= N - 1; i++) {
-			sum += getHarmonicShare(t, i);
-		}
-		return sum;
-	}
-	
-	private double getHarmonicShare(int t, int i) {
-		double n = 2.0 * i + 1.0;
-		return Math.pow(-1.0, i) * Math.pow(n, -2.0) * Math.sin(2.0 * Math.PI * frequency * (t / AudioClip.rate) * n);
 	}
 	
 	@Override
@@ -50,6 +49,6 @@ public class SawToothWave implements AudioComponent {
 	
 	@Override
 	public void connectInput(AudioComponent input) {
-	
+		assert hasInput();
 	}
 }

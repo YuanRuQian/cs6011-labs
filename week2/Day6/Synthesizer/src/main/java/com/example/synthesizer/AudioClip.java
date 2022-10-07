@@ -1,19 +1,14 @@
 package com.example.synthesizer;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
 import java.util.Arrays;
-
-import static javax.sound.sampled.AudioSystem.getClip;
 
 public class AudioClip {
 	
 	// same duration 2.0s
 	public static Double duration = 2.0;
 	// sample rate 44.1 KHz
-	public static int rate = 44100;
-	private byte[] data;
+	private static int rate = 44100;
+	private final byte[] data;
 	public static short maxValue = Short.MAX_VALUE;
 	public static final int TOTAL_SAMPLES = (int) (duration * rate);
 	
@@ -43,39 +38,11 @@ public class AudioClip {
 		data[2 * index + 1] = higher8bits;
 	}
 	
+	public static int getRate() {
+		return rate;
+	}
+	
 	byte[] getData() {
 		return Arrays.copyOf(data, (int) (duration * rate * 2));
 	}
-	
-	public void play()
-	{
-		Clip c = null; // Note, this is different from our AudioClip class.
-		try {
-			c = getClip();
-		} catch (LineUnavailableException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-		// This is the format that we're following, 44.1 KHz mono audio, 16 bits per sample.
-		AudioFormat format16 = new AudioFormat(44100, 16, 1, true, false);
-		try {
-			c.open(format16, getData(), 0, getData().length); // Reads data from our byte array to play it.
-		} catch (LineUnavailableException | NullPointerException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-		
-		System.out.println("About to play an audio clip");
-		c.start(); // Plays it.
-		c.loop(1);
-		
-		// Makes sure the program doesn't quit before the sound plays.
-		while (c.getFramePosition() < AudioClip.TOTAL_SAMPLES || c.isActive() || c.isRunning()) {
-			// Do nothing while we wait for the note to play.
-		}
-		
-		System.out.println("End of the audio clip");
-		c.close();
-	}
-	
 }

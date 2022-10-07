@@ -1,7 +1,7 @@
 package com.example.synthesizer;
 
 public class VFSquareWave implements AudioComponent {
-	private AudioClip audioClip;
+	private final AudioClip audioClip;
 	
 	VFSquareWave() {
 		audioClip = new AudioClip();
@@ -25,7 +25,7 @@ public class VFSquareWave implements AudioComponent {
 		double[] phases = new double[AudioClip.TOTAL_SAMPLES];
 		double maxPhase = Double.MIN_VALUE, minPhase = Double.MAX_VALUE;
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			phase += 2.0 * Math.PI * inputAudioClip.getSample(i) / AudioClip.rate;
+			phase += 2.0 * Math.PI * inputAudioClip.getSample(i) / AudioClip.getRate();
 			phases[i] = phase;
 			maxPhase = Math.max(maxPhase, phase);
 			minPhase = Math.min(minPhase, phase);

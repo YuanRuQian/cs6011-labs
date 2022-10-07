@@ -1,27 +1,15 @@
 package com.example.synthesizer;
 
-import java.util.Arrays;
-
 public class LinearRamp implements AudioComponent {
 	public float start;
 	public float end;
-	private boolean clamping;
-	private AudioClip audioClip;
+	private final boolean clamping;
+	private final AudioClip audioClip;
 	
-	LinearRamp(boolean clamping) {
-		start = 50;
-		end = 2000;
-		this.clamping = clamping;
-		this.audioClip = new AudioClip();
-		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			short sample = getProcessedSample((start * (AudioClip.TOTAL_SAMPLES - i) + end * i) / AudioClip.TOTAL_SAMPLES);
-			audioClip.setSample(i, sample);
-		}
-	}
-	
-	LinearRamp(float start, float end) {
+	LinearRamp(float start, float end, boolean clamping) {
 		this.start = start;
 		this.end = end;
+		this.clamping = clamping;
 		this.audioClip = new AudioClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			short sample = getProcessedSample((start * (AudioClip.TOTAL_SAMPLES - i) + end * i) / AudioClip.TOTAL_SAMPLES);

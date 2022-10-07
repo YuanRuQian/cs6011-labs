@@ -7,14 +7,14 @@ class VFSineWaveTest {
 	}
 	
 	static void hearASineWaveGeneratedByDefaultVF() {
-		LinearRamp linearRamp = new LinearRamp(50, 2000);
+		LinearRamp linearRamp = new LinearRamp(50, 2000, true);
 		VFSineWave vfSineWave = new VFSineWave();
 		vfSineWave.connectInput(linearRamp);
 		PlayAudioClip.play(vfSineWave.getClip(),"default VF",1);
 	}
 	
 	static void hearASineWaveGeneratedByCustomVF() {
-		LinearRamp linearRamp = new LinearRamp(50, 10000);
+		LinearRamp linearRamp = new LinearRamp(50, 10000, true);
 		VFSineWave vfSineWave = new VFSineWave();
 		vfSineWave.connectInput(linearRamp);
 		PlayAudioClip.play(vfSineWave.getClip(),"default VF",1);

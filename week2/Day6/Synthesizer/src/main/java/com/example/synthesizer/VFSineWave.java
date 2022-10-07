@@ -1,7 +1,7 @@
 package com.example.synthesizer;
 
 public class VFSineWave implements AudioComponent {
-	private AudioClip audioClip;
+	private final AudioClip audioClip;
 	
 	VFSineWave()
 	{
@@ -24,7 +24,7 @@ public class VFSineWave implements AudioComponent {
 		double phase = 0.0;
 		AudioClip inputAudioClip = input.getClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			phase += 2.0 * Math.PI * inputAudioClip.getSample(i) / AudioClip.rate;
+			phase += 2.0 * Math.PI * inputAudioClip.getSample(i) / AudioClip.getRate();
 			audioClip.setSample(i, (short) (Short.MAX_VALUE * Math.sin( phase )));
 		}
 	}
