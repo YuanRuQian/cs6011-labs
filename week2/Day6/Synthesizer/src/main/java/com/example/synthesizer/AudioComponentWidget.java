@@ -4,10 +4,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,56 +14,34 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polyline;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.function.Function;
 
-// TODO: group classes with packages
 public class AudioComponentWidget extends Pane {
-	// TODO: move all member variables to the bottom
-	// TODO: add underscore to all private member variables
-	private static double defaultFrequency = 440;
-	private final String name;
-	private AudioComponent audioComponent;
-	private final AnchorPane parent;
-	private final Slider frequencySlider;
-	private Line line;
-	private final Circle socket;
-	private final Label label;
-	private final Function<Integer, AudioComponent> audioComponentUpdater;
-	
-	private double mouseBeforeDraggingPositionX;
-	private double mouseBeforeDraggingPositionY;
-	private double widgetBeforeDraggingPositionX;
-	private double widgetBeforeDraggingPositionY;
-	private AudioComponentGraphWidget audioComponentGraph;
-	
 	AudioComponentWidget(AudioComponent audioComponent, AnchorPane parent, String name, Function<Integer, AudioComponent> audioComponentUpdater, Paint color) {
-		this.audioComponent = audioComponent;
-		this.parent = parent;
+		audioComponent_ = audioComponent;
+		parent_ = parent;
 		HBox widget = new HBox();
-		this.name = name;
-		this.audioComponentUpdater = audioComponentUpdater;
-		this.audioComponentGraph = new AudioComponentGraphWidget(this);
+		name_ = name;
+		audioComponentUpdater_ = audioComponentUpdater;
+		audioComponentGraph_ = new AudioComponentGraphWidget(this);
 		
 		VBox leftPane = new VBox();
-		frequencySlider = new Slider(200, 1000, defaultFrequency);
-		label = new Label(getCurrentFrequency(frequencySlider.getValue()));
-		label.setStyle("-fx-fit-to-width: true");
-		frequencySlider.setOnMouseDragged(mouseEvent -> onFrequencyChange());
+		
+		
 		Button showGraphButton = new Button("Show Graph");
 		showGraphButton.setOnMouseClicked(mouseEvent -> showGraph());
 		
-		// make sure the event is captured by the leftPane rather than the nameLabel / slider
-		label.setMouseTransparent(true);
-		
 		leftPane.setSpacing(10.0);
-		leftPane.getChildren().add(label);
-		leftPane.getChildren().add(frequencySlider);
+		
+		// white noise is not impacted by frequency
+		if (!(audioComponent_ instanceof WhiteNoise)) {
+			FrequencySlider frequencySlider = new FrequencySlider(name_, this);
+			leftPane.getChildren().add(frequencySlider);
+		}
+		
 		leftPane.getChildren().add(showGraphButton);
 		leftPane.setAlignment(Pos.CENTER);
 		
@@ -87,13 +62,13 @@ public class AudioComponentWidget extends Pane {
 		Button closeButton = new Button("", imageView);
 		closeButton.setOnMouseClicked(mouseEvent -> removeWidget());
 		
-		socket = new Circle(10.0);
-		socket.setOnMousePressed(this::startConnection);
-		socket.setOnMouseDragged(this::moveConnection);
-		socket.setOnMouseReleased(this::endConnection);
+		socket_ = new Circle(10.0);
+		socket_.setOnMousePressed(this::startConnection);
+		socket_.setOnMouseDragged(this::moveConnection);
+		socket_.setOnMouseReleased(this::endConnection);
 		rightPane.setSpacing(10.0);
 		rightPane.getChildren().add(closeButton);
-		rightPane.getChildren().add(socket);
+		rightPane.getChildren().add(socket_);
 		rightPane.setAlignment(Pos.CENTER);
 		
 		widget.setStyle("-fx-alignment: center;");
@@ -109,19 +84,12 @@ public class AudioComponentWidget extends Pane {
 		this.setLayoutY(100.0);
 	}
 	
+	public void updateAudioComponent(AudioComponent newAudioComponent) {
+		audioComponent_ = newAudioComponent;
+	}
+	
 	private void showGraph() {
-		audioComponentGraph.showGraph();
-	}
-	
-	private void onFrequencyChange() {
-		label.setText(getCurrentFrequency(frequencySlider.getValue()));
-		audioComponent = audioComponentUpdater.apply((int) frequencySlider.getValue());
-		
-		audioComponentGraph.updatePolyLine();
-	}
-	
-	private String getCurrentFrequency(Number currentFrequency) {
-		return name + " (" + currentFrequency.intValue() + " Hz)";
+		audioComponentGraph_.showGraph();
 	}
 	
 	private void endConnection(MouseEvent mouseEvent) {
@@ -130,9 +98,9 @@ public class AudioComponentWidget extends Pane {
 		double distance = Math.sqrt(Math.pow(speakerBounds.getCenterX() - mouseEvent.getSceneX(), 2.0) + Math.pow(speakerBounds.getCenterY() - mouseEvent.getSceneY(), 2.0));
 		if (distance > SpeakerWidget.circleWidgetRadius) {
 			// if the mouse isn't in the circle, remove the line
-			parent.getChildren().remove(line);
+			parent_.getChildren().remove(line_);
 			SpeakerWidget.removeWidget(this);
-			line = null;
+			line_ = null;
 		} else {
 			// connect the current widget to the speaker
 			SpeakerWidget.addWidget(this);
@@ -141,75 +109,92 @@ public class AudioComponentWidget extends Pane {
 	}
 	
 	private void moveConnection(MouseEvent mouseEvent) {
-		Bounds parentBounds = parent.getBoundsInParent();
-		line.setEndX(mouseEvent.getSceneX() - parentBounds.getMinX());
-		line.setEndY(mouseEvent.getSceneY() - parentBounds.getMinY());
+		Bounds parentBounds = parent_.getBoundsInParent();
+		line_.setEndX(mouseEvent.getSceneX() - parentBounds.getMinX());
+		line_.setEndY(mouseEvent.getSceneY() - parentBounds.getMinY());
 	}
 	
 	private Point2D getSocketCenterPosition() {
-		Bounds bounds = socket.localToScene(socket.getBoundsInLocal());
+		Bounds bounds = socket_.localToScene(socket_.getBoundsInLocal());
 		return new Point2D(bounds.getCenterX(), bounds.getCenterY());
 	}
 	
 	
 	private void startConnection(MouseEvent mouseEvent) {
 		// make sure that one audio component widget can only be connected to one thing
-		if (line != null) {
-			parent.getChildren().remove(line);
+		if (line_ != null) {
+			parent_.getChildren().remove(line_);
 			SpeakerWidget.removeWidget(this);
 		}
 		Point2D socketCenterPosition = getSocketCenterPosition();
 		double endX = mouseEvent.getSceneX();
 		double endY = mouseEvent.getSceneY();
-		line = new Line(socketCenterPosition.getX(), socketCenterPosition.getY(), endX, endY);
-		line.setFill(Color.BLACK);
-		line.setStrokeWidth(4);
-		parent.getChildren().add(line);
+		line_ = new Line(socketCenterPosition.getX(), socketCenterPosition.getY(), endX, endY);
+		line_.setFill(Color.BLACK);
+		line_.setStrokeWidth(4);
+		parent_.getChildren().add(line_);
 	}
 	
 	
 	private void onMousePressed(MouseEvent mouseEvent) {
-		mouseBeforeDraggingPositionX = mouseEvent.getSceneX();
-		mouseBeforeDraggingPositionY = mouseEvent.getSceneY();
-		widgetBeforeDraggingPositionX = this.getLayoutX();
-		widgetBeforeDraggingPositionY = this.getLayoutY();
+		mouseBeforeDraggingPositionX_ = mouseEvent.getSceneX();
+		mouseBeforeDraggingPositionY_ = mouseEvent.getSceneY();
+		widgetBeforeDraggingPositionX_ = this.getLayoutX();
+		widgetBeforeDraggingPositionY_ = this.getLayoutY();
 	}
 	
 	private void onMouseDragged(MouseEvent mouseEvent) {
-		double mouseDeltaX = mouseEvent.getSceneX() - mouseBeforeDraggingPositionX;
-		double mouseDeltaY = mouseEvent.getSceneY() - mouseBeforeDraggingPositionY;
-		this.relocate(widgetBeforeDraggingPositionX + mouseDeltaX, widgetBeforeDraggingPositionY + mouseDeltaY);
-		if (line == null) {
+		double mouseDeltaX = mouseEvent.getSceneX() - mouseBeforeDraggingPositionX_;
+		double mouseDeltaY = mouseEvent.getSceneY() - mouseBeforeDraggingPositionY_;
+		this.relocate(widgetBeforeDraggingPositionX_ + mouseDeltaX, widgetBeforeDraggingPositionY_ + mouseDeltaY);
+		if (line_ == null) {
 			return;
 		}
 		// move the line along with the widget
 		Point2D socketCenterPosition = getSocketCenterPosition();
-		line.setStartX(socketCenterPosition.getX());
-		line.setStartY(socketCenterPosition.getY());
+		line_.setStartX(socketCenterPosition.getX());
+		line_.setStartY(socketCenterPosition.getY());
 	}
 	
 	private void removeWidget() {
-		parent.getChildren().remove(this);
+		parent_.getChildren().remove(this);
 		SpeakerWidget.removeWidget(this);
-		if (line != null) {
-			parent.getChildren().remove(line);
+		if (line_ != null) {
+			parent_.getChildren().remove(line_);
 		}
 	}
 	
-	public double getCurrentFrequency() {
-		return frequencySlider.getValue();
-	}
-	
 	public String getName() {
-		return name;
+		return name_;
 	}
 	
 	public static double getDefaultFrequency() {
-		return defaultFrequency;
+		return defaultFrequency_;
 	}
 	
 	public AudioComponent getAudioComponent() {
-		return audioComponent;
+		return audioComponent_;
 	}
 	
+	public Function<Integer, AudioComponent> getAudioComponentUpdater() {
+		return audioComponentUpdater_;
+	}
+	
+	public AudioComponentGraphWidget getAudioComponentGraph() {
+		return audioComponentGraph_;
+	}
+	
+	private static final double defaultFrequency_ = 440;
+	private final String name_;
+	private AudioComponent audioComponent_;
+	private final AnchorPane parent_;
+	private Line line_;
+	private final Circle socket_;
+	private final Function<Integer, AudioComponent> audioComponentUpdater_;
+	
+	private double mouseBeforeDraggingPositionX_;
+	private double mouseBeforeDraggingPositionY_;
+	private double widgetBeforeDraggingPositionX_;
+	private double widgetBeforeDraggingPositionY_;
+	private final AudioComponentGraphWidget audioComponentGraph_;
 }

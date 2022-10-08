@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 public class SynthesizeApplication extends Application {
 	
-	private static AnchorPane mainCanvas__ = new AnchorPane();
+	
 	
 	@Override
 	public void start(Stage stage) {
@@ -69,5 +69,7 @@ public class SynthesizeApplication extends Application {
 	public static void main(String[] args) {
 		launch();
 	}
+	
+	private static AnchorPane mainCanvas__ = new AnchorPane();
 	
 }

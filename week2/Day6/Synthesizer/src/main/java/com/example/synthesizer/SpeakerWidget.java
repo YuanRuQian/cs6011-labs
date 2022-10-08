@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import javax.sound.sampled.AudioFormat;
@@ -21,34 +22,22 @@ import javax.sound.sampled.LineUnavailableException;
 import java.util.ArrayList;
 
 public class SpeakerWidget extends Pane {
-	
-	private static ArrayList<AudioComponentWidget> connectedWidgets;
-	private static Clip clip;
-	private static Circle speaker;
-	private static Button showGraphButton;
-	private static double volumeScale;
-	private static VolumeSlider volumeSlider;
-	public static double circleWidgetRadius = 20.0;
-	
-	private static Polyline polyline;
-	private static HBox canvas;
-	private static Stage stage;
-	
 	SpeakerWidget() {
-		volumeScale = 1;
-		volumeSlider = new VolumeSlider();
-		connectedWidgets = new ArrayList<>();
+		volumeScale_ = 1;
+		volumeSlider_ = new VolumeSlider();
+		connectedWidgets_ = new ArrayList<>();
 		VBox widget = new VBox();
-		speaker = new Circle(circleWidgetRadius);
-		speaker.setFill(Color.BLACK);
+		speaker_ = new Circle(circleWidgetRadius);
+		speaker_.setFill(Color.BLACK);
 		Label label = new Label("speaker");
-		showGraphButton = new Button("Show Graph");
-		showGraphButton.setOnMouseClicked(mouseEvent -> showGraph());
+		showGraphButton_ = new Button(emptyWidgetsButtonText);
+		showGraphButton_.setTextAlignment(TextAlignment.CENTER);
+		showGraphButton_.setOnMouseClicked(mouseEvent -> showGraph());
 		disableShowGraphButton();
-		widget.getChildren().add(speaker);
+		widget.getChildren().add(speaker_);
 		widget.getChildren().add(label);
-		widget.getChildren().add(volumeSlider);
-		widget.getChildren().add(showGraphButton);
+		widget.getChildren().add(volumeSlider_);
+		widget.getChildren().add(showGraphButton_);
 		widget.setSpacing(20.0);
 		widget.setAlignment(Pos.CENTER);
 		this.getChildren().add(widget);
@@ -57,104 +46,110 @@ public class SpeakerWidget extends Pane {
 		
 		// draw graph
 		AnchorPane pane = new AnchorPane();
-		canvas = new HBox();
+		canvas_ = new HBox();
 		
-		polyline = new Polyline();
-		polyline.setStrokeWidth(1.0);
-		canvas.setPadding(new Insets(20.0));
-		canvas.getChildren().add(polyline);
+		polyline_ = new Polyline();
+		polyline_.setStrokeWidth(1.0);
+		canvas_.setPadding(new Insets(20.0));
+		canvas_.getChildren().add(polyline_);
 		
-		pane.getChildren().addAll(canvas);
-		stage = new Stage();
+		pane.getChildren().addAll(canvas_);
+		stage_ = new Stage();
 		Scene scene = new Scene(pane);
-		stage.setTitle("Graph of Speaker's Filtered & Mixed Results");
-		stage.setScene(scene);
+		stage_.setTitle("Graph of Speaker's Filtered & Mixed Results");
+		stage_.setScene(scene);
 	}
 	
 	public static void updatePolyLine() {
-		System.out.println("update poly line");
-		if (polyline != null) {
-			canvas.getChildren().remove(polyline);
+		if(connectedWidgets_.isEmpty())
+		{
+			return;
+		}
+		if (polyline_ != null) {
+			canvas_.getChildren().remove(polyline_);
 		}
 		
-		polyline = new Polyline();
-		polyline.setStrokeWidth(1.0);
+		polyline_ = new Polyline();
+		polyline_.setStrokeWidth(1.0);
 		
 		AudioClip resultClip = getCurrentFilteredResult().getClip();
 		for (int i = 0; i < AudioClip.getRate() / AudioComponentWidget.getDefaultFrequency() * 4; i++) {
-			polyline.getPoints().addAll(
+			polyline_.getPoints().addAll(
 					(double) i, (double) resultClip.getSample(i) / Short.MAX_VALUE * 200);
 		}
-		canvas.getChildren().add(polyline);
-		System.out.println("end poly line");
+		canvas_.getChildren().add(polyline_);
 	}
 	
 	private void showGraph() {
 		updatePolyLine();
-		stage.show();
+		stage_.show();
 	}
 	
 	public static Circle getSpeaker() {
-		return speaker;
+		return speaker_;
 	}
 	
 	public static void addWidget(AudioComponentWidget newWidget) {
-		connectedWidgets.add(newWidget);
-		volumeSlider.enableSlider();
+		connectedWidgets_.add(newWidget);
+		volumeSlider_.enableSlider();
 		PlayAudioButton.setButtonToActive();
 		enableShowGraphButton();
+		showGraphButton_.setText(buttonText);
+		updatePolyLine();
 	}
 	
 	public static void removeWidget(AudioComponentWidget oldWidget) {
-		connectedWidgets.remove(oldWidget);
-		if (connectedWidgets.isEmpty()) {
+		connectedWidgets_.remove(oldWidget);
+		if (connectedWidgets_.isEmpty()) {
 			PlayAudioButton.setButtonToDisabled();
 			disableShowGraphButton();
-			volumeSlider.disableSlider();
+			volumeSlider_.disableSlider();
+			showGraphButton_.setText(emptyWidgetsButtonText);
+			updatePolyLine();
 		} else {
 			PlayAudioButton.setButtonToActive();
 		}
 	}
 	
 	private static void playAudioClipFrom(AudioClip audioClip) {
-		clip = null;
+		clip_ = null;
 		try {
-			clip = AudioSystem.getClip();
+			clip_ = AudioSystem.getClip();
 		} catch (LineUnavailableException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		AudioFormat format16 = new AudioFormat(44100, 16, 1, true, false);
 		try {
-			clip.open(format16, audioClip.getData(), 0, audioClip.getData().length);
+			clip_.open(format16, audioClip.getData(), 0, audioClip.getData().length);
 		} catch (LineUnavailableException | NullPointerException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		clip.start();
+		clip_.start();
 	}
 	
 	private static void endPlayingAudioClip() {
-		clip.close();
+		clip_.close();
 	}
 	
 	private static void disableShowGraphButton() {
-		showGraphButton.setDisable(true);
+		showGraphButton_.setDisable(true);
 	}
 	
 	private static void enableShowGraphButton() {
-		showGraphButton.setDisable(false);
+		showGraphButton_.setDisable(false);
 	}
 	
 	private static VolumeFilter getCurrentFilteredResult() {
 		// mix all connected audio clips
 		AdditionMixer additionMixer = new AdditionMixer();
-		for (AudioComponentWidget widget : connectedWidgets) {
+		for (AudioComponentWidget widget : connectedWidgets_) {
 			AudioComponent newInput = widget.getAudioComponent();
 			additionMixer.connectInput(newInput);
 		}
 		// adjust the volume
-		return new VolumeFilter(additionMixer, volumeScale);
+		return new VolumeFilter(additionMixer, volumeScale_);
 	}
 	
 	
@@ -167,8 +162,22 @@ public class SpeakerWidget extends Pane {
 	}
 	
 	public static void updateVolumeScale(double newVolumeScale) {
-		volumeScale = newVolumeScale;
+		volumeScale_ = newVolumeScale;
 		updatePolyLine();
 	}
+	
+	private static ArrayList<AudioComponentWidget> connectedWidgets_;
+	private static Clip clip_;
+	private static Circle speaker_;
+	private static Button showGraphButton_;
+	private static double volumeScale_;
+	private static VolumeSlider volumeSlider_;
+	public static double circleWidgetRadius = 20.0;
+	
+	private static Polyline polyline_;
+	private static HBox canvas_;
+	private static Stage stage_;
+	private static final String emptyWidgetsButtonText = "Connect Widgets to\n See Result Graph";
+	private static final String buttonText = "Show Graph";
 	
 }

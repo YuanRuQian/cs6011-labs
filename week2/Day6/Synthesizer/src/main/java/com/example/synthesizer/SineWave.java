@@ -1,27 +1,26 @@
 package com.example.synthesizer;
 
 public class SineWave implements AudioComponent {
-	private final AudioClip audioClip;
 	
-	public SineWave() {
-		audioClip = new AudioClip();
+	SineWave() {
+		audioClip_ = new AudioClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			short sampleData = (short) (AudioClip.maxValue * Math.sin(2 * Math.PI * AudioComponentWidget.getDefaultFrequency() * i / AudioClip.getRate()));
-			audioClip.setSample(i, sampleData);
+			audioClip_.setSample(i, sampleData);
 		}
 	}
 	public SineWave(int frequency) {
-		audioClip = new AudioClip();
+		audioClip_ = new AudioClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			short sampleData = (short) (AudioClip.maxValue * Math.sin(2 * Math.PI * frequency * i / AudioClip.getRate()));
-			audioClip.setSample(i, sampleData);
+			audioClip_.setSample(i, sampleData);
 		}
 	}
 	
 	
 	@Override
 	public AudioClip getClip() {
-		return audioClip;
+		return audioClip_;
 	}
 	
 	@Override
@@ -34,4 +33,6 @@ public class SineWave implements AudioComponent {
 		assert hasInput();
 		System.out.println("Sine wave connect input");
 	}
+	
+	private final AudioClip audioClip_;
 }

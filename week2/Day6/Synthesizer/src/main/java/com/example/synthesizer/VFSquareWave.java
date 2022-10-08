@@ -1,16 +1,13 @@
 package com.example.synthesizer;
 
 public class VFSquareWave implements AudioComponent {
-	private final AudioClip audioClip;
-	
 	VFSquareWave() {
-		audioClip = new AudioClip();
+		audioClip_ = new AudioClip();
 	}
-	
 	
 	@Override
 	public AudioClip getClip() {
-		return audioClip;
+		return audioClip_;
 	}
 	
 	@Override
@@ -33,7 +30,9 @@ public class VFSquareWave implements AudioComponent {
 		double midPhase = minPhase + (maxPhase - minPhase) / 2;
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			short sample = phases[i] > midPhase ? Short.MAX_VALUE : Short.MIN_VALUE;
-			audioClip.setSample(i, sample);
+			audioClip_.setSample(i, sample);
 		}
 	}
+	
+	private final AudioClip audioClip_;
 }

@@ -1,17 +1,14 @@
 package com.example.synthesizer;
 
 public class VFSineWave implements AudioComponent {
-	private final AudioClip audioClip;
-	
 	VFSineWave()
 	{
-		audioClip = new AudioClip();
+		audioClip_ = new AudioClip();
 	}
-	
 	
 	@Override
 	public AudioClip getClip() {
-		return audioClip;
+		return audioClip_;
 	}
 	
 	@Override
@@ -25,7 +22,9 @@ public class VFSineWave implements AudioComponent {
 		AudioClip inputAudioClip = input.getClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
 			phase += 2.0 * Math.PI * inputAudioClip.getSample(i) / AudioClip.getRate();
-			audioClip.setSample(i, (short) (Short.MAX_VALUE * Math.sin( phase )));
+			audioClip_.setSample(i, (short) (Short.MAX_VALUE * Math.sin( phase )));
 		}
 	}
+	
+	private final AudioClip audioClip_;
 }

@@ -9,40 +9,41 @@ import javafx.scene.layout.VBox;
 import java.text.DecimalFormat;
 
 public class VolumeSlider extends Pane {
-	private final Slider slider;
-	private final Label label;
-	private final DecimalFormat df = new DecimalFormat("0.00");
-	
 	VolumeSlider()
 	{
 		VBox widget = new VBox();
-		slider = new Slider(0, 200, 100);
-		slider.setOnMouseDragged(mouseEvent -> onVolumeChange());
+		slider_ = new Slider(0, 200, 100);
+		slider_.setOnMouseDragged(mouseEvent -> onVolumeChange());
 		disableSlider();
-		label = new Label(getCurrentVolumeLabelText());
-		widget.getChildren().add(label);
-		widget.getChildren().add(slider);
+		label_ = new Label(getCurrentVolumeLabelText());
+		widget.getChildren().add(label_);
+		widget.getChildren().add(slider_);
 		widget.setAlignment(Pos.CENTER);
 		this.getChildren().add(widget);
 	}
 	
 	private void onVolumeChange() {
-		label.setText(getCurrentVolumeLabelText());
-		SpeakerWidget.updateVolumeScale(slider.getValue()/100);
+		label_.setText(getCurrentVolumeLabelText());
+		SpeakerWidget.updateVolumeScale(slider_.getValue()/100);
 	}
 	
 	private String getCurrentVolumeLabelText()
 	{
-		return "Volume: " + df.format(slider.getValue()) + "%";
+		return "Volume: " + df.format(slider_.getValue()) + "%";
 	}
 	
 	public void enableSlider()
 	{
-		slider.setDisable(false);
+		slider_.setDisable(false);
 	}
 	
 	public void disableSlider()
 	{
-		slider.setDisable(true);
+		slider_.setDisable(true);
 	}
+	
+	private final Slider slider_;
+	private final Label label_;
+	private final DecimalFormat df = new DecimalFormat("0.00");
+	
 }

@@ -1,15 +1,14 @@
 package com.example.synthesizer;
 
 public class MultiplicationMixer implements AudioComponent {
-	private final AudioClip result;
 	
-	public MultiplicationMixer() {
-		this.result = new AudioClip();
+	MultiplicationMixer() {
+		result_ = new AudioClip();
 	}
 	
 	@Override
 	public AudioClip getClip() {
-		return result;
+		return result_;
 	}
 	
 	@Override
@@ -22,8 +21,10 @@ public class MultiplicationMixer implements AudioComponent {
 		//  adds new input signal to update the output
 		AudioClip audioClip = input.getClip();
 		for (int i = 0; i < AudioClip.TOTAL_SAMPLES; i++) {
-			short currentSum = ShortClampingHelper.getClampedShort(audioClip.getSample(i) * result.getSample(i));
-			result.setSample(i, currentSum);
+			short currentSum = ShortClampingHelper.getClampedShort(audioClip.getSample(i) * result_.getSample(i));
+			result_.setSample(i, currentSum);
 		}
 	}
+	
+	private final AudioClip result_;
 }
