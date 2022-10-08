@@ -148,13 +148,13 @@ public class SpeakerWidget extends Pane {
 	
 	private static VolumeFilter getCurrentFilteredResult() {
 		// mix all connected audio clips
-		AdditionMixer additionMixer = new AdditionMixer(true);
+		AdditionMixer additionMixer = new AdditionMixer();
 		for (AudioComponentWidget widget : connectedWidgets) {
 			AudioComponent newInput = widget.getAudioComponent();
 			additionMixer.connectInput(newInput);
 		}
 		// adjust the volume
-		return new VolumeFilter(additionMixer, volumeScale, true);
+		return new VolumeFilter(additionMixer, volumeScale);
 	}
 	
 	

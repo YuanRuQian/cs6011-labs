@@ -175,7 +175,6 @@ public class AudioComponentWidget extends Pane {
 		widgetBeforeDraggingPositionY = this.getLayoutY();
 	}
 	
-	// TODO: confine the widget in the canvas
 	private void onMouseDragged(MouseEvent mouseEvent) {
 		double mouseDeltaX = mouseEvent.getSceneX() - mouseBeforeDraggingPositionX;
 		double mouseDeltaY = mouseEvent.getSceneY() - mouseBeforeDraggingPositionY;
@@ -197,17 +196,15 @@ public class AudioComponentWidget extends Pane {
 		}
 	}
 	
-	public double getCurrentFrequency()
-	{
+	public double getCurrentFrequency() {
 		return frequencySlider.getValue();
 	}
 	
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
-	public static double getDefaultFrequency()
-	{
+	
+	public static double getDefaultFrequency() {
 		return defaultFrequency;
 	}
 	

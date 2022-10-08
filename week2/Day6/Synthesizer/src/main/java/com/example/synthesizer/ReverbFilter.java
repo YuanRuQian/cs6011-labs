@@ -4,13 +4,11 @@ public class ReverbFilter implements AudioComponent {
 	private final AudioComponent input;
 	private final double scale;
 	private final short delay;
-	private final boolean clamping;
 	
-	public ReverbFilter(AudioComponent audioComponent, double scale, short delay, boolean clamping) {
+	public ReverbFilter(AudioComponent audioComponent, double scale, short delay) {
 		this.input = audioComponent;
 		this.scale = scale;
 		this.delay = delay;
-		this.clamping = clamping;
 	}
 	
 	public AudioClip getClip() {
@@ -18,15 +16,7 @@ public class ReverbFilter implements AudioComponent {
 		AudioClip result = new AudioClip(original);
 		// adjusts the input clip's volume
 		for (int index = 0; index < result.getData().length / 2; index++) {
-			double doubleSample = scale * original.getSample(index);
-			short sample = (short) doubleSample;
-			if (clamping) {
-				if (doubleSample > Short.MAX_VALUE) {
-					sample = Short.MAX_VALUE;
-				} else if (doubleSample < Short.MIN_VALUE) {
-					sample = Short.MIN_VALUE;
-				}
-			}
+			short sample = ShortClampingHelper.getClampedShort(scale * original.getSample(index));
 			result.setSample((index + delay) % AudioClip.TOTAL_SAMPLES, sample);
 		}
 		return result;

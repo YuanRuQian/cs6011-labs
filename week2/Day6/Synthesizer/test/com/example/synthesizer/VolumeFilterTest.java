@@ -14,7 +14,7 @@ class VolumeFilterTest {
 		AudioClip clip = gen.getClip();
 		PlayAudioClip.play(clip, "unfiltered clip", 1);
 		
-		AudioClip filteredClip = new VolumeFilter(gen, 0.42, true).getClip();
+		AudioClip filteredClip = new VolumeFilter(gen, 0.42).getClip();
 		PlayAudioClip.play(filteredClip, "filtered clip", 1);
 	}
 }

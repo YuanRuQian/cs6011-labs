@@ -14,7 +14,7 @@ class ReverbFilterTest {
 		AudioClip clip = gen.getClip();
 		PlayAudioClip.play(clip, "unfiltered clip", 1);
 		
-		AudioClip filteredClip = new ReverbFilter(gen, 1.42, (short) 500, true).getClip();
+		AudioClip filteredClip = new ReverbFilter(gen, 1.42, (short) 500).getClip();
 		PlayAudioClip.play(filteredClip, "filtered clip", 1);
 	}
 }

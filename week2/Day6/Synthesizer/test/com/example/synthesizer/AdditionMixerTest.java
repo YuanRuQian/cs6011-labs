@@ -19,7 +19,7 @@ class AdditionMixerTest {
 		AudioClip clip2 = gen2.getClip();
 		PlayAudioClip.play(clip2, "clip2" ,frequency2, 1);
 		
-		AudioComponent mixer = new AdditionMixer(true);
+		AudioComponent mixer = new AdditionMixer();
 		
 		mixer.connectInput(gen1);
 		mixer.connectInput(gen2);

@@ -1,7 +1,5 @@
 package com.example.synthesizer;
 
-// TODO: auto clamp across the project
-// TODO: use the helper method across the project
 public class ShortClampingHelper {
 	public static short getClampedShort(double input)
 	{
