@@ -10,6 +10,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+
 public class SynthesizeApplication extends Application {
 	
 	
@@ -51,9 +58,28 @@ public class SynthesizeApplication extends Application {
 		
 		
 		Scene scene = new Scene(root, 1000, 800);
-		stage.setTitle("Lydia's Synthesizer");
 		stage.setScene(scene);
+		stage.setTitle("Lydia's Synthesizer");
+		setTaskBarIcon();
 		stage.show();
+	}
+	
+	private static void setTaskBarIcon()
+	{
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File("src/main/java/com/example/synthesizer/dockAppIcon.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		final Taskbar taskbar = Taskbar.getTaskbar();
+		try {
+			taskbar.setIconImage(img);
+		} catch (final UnsupportedOperationException e) {
+			System.out.println("The os does not support: 'taskbar.setIconImage'");
+		} catch (final SecurityException e) {
+			System.out.println("There was a security exception for: 'taskbar.setIconImage'");
+		}
 	}
 	
 	public static AnchorPane getMainCanvas()
