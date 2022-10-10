@@ -20,9 +20,9 @@ import java.io.FileNotFoundException;
 import java.util.function.Function;
 
 public class AudioComponentWidget extends Pane {
-	AudioComponentWidget(AudioComponent audioComponent, AnchorPane parent, String name, Function<Integer, AudioComponent> audioComponentUpdater, Paint color) {
+	AudioComponentWidget(AudioComponent audioComponent, String name, Function<Integer, AudioComponent> audioComponentUpdater, Paint color) {
 		audioComponent_ = audioComponent;
-		parent_ = parent;
+		parent_ = SynthesizeApplication.getMainCanvas();
 		HBox widget = new HBox();
 		name_ = name;
 		audioComponentUpdater_ = audioComponentUpdater;
@@ -115,8 +115,9 @@ public class AudioComponentWidget extends Pane {
 	}
 	
 	private Point2D getSocketCenterPosition() {
+		Double topPaneHeight = SynthesizeApplication.getTopPane().getHeight();
 		Bounds bounds = socket_.localToScene(socket_.getBoundsInLocal());
-		return new Point2D(bounds.getCenterX(), bounds.getCenterY());
+		return new Point2D(bounds.getCenterX(), bounds.getCenterY() - topPaneHeight);
 	}
 	
 	
@@ -134,7 +135,6 @@ public class AudioComponentWidget extends Pane {
 		line_.setStrokeWidth(4);
 		parent_.getChildren().add(line_);
 	}
-	
 	
 	private void onMousePressed(MouseEvent mouseEvent) {
 		mouseBeforeDraggingPositionX_ = mouseEvent.getSceneX();

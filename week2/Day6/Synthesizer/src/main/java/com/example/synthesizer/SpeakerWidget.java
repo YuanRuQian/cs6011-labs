@@ -41,7 +41,7 @@ public class SpeakerWidget extends Pane {
 		widget.setSpacing(20.0);
 		widget.setAlignment(Pos.CENTER);
 		this.getChildren().add(widget);
-		this.setLayoutX(400.0);
+		this.setLayoutX(425.0);
 		this.setLayoutY(200.0);
 		
 		// draw graph

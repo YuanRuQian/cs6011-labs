@@ -1,6 +1,7 @@
 package com.example.synthesizer;
 
 import javafx.application.Application;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,39 +24,26 @@ public class SynthesizeApplication extends Application {
 	
 	@Override
 	public void start(Stage stage) {
-		
+		AddNewWidgetMenu addNewWidgetMenu = new AddNewWidgetMenu();
 		SpeakerWidget speakerWidget = new SpeakerWidget();
-		AddSineWaveWidgetButton addSineWaveWidgetButton = new AddSineWaveWidgetButton();
-		AddCosineWaveWidgetButton addCosineWaveWidgetButton = new AddCosineWaveWidgetButton();
-		AddSquareWaveWidgetButton addSquareWaveWidgetButton = new AddSquareWaveWidgetButton();
-		AddWhiteNoiseWidgetButton addWhiteNoiseWidgetButton = new AddWhiteNoiseWidgetButton();
-		AddSawToothWaveWidgetButton addSawToothWaveWidgetButton = new AddSawToothWaveWidgetButton();
 		PlayAudioButton playAudioButton = new PlayAudioButton();
 		BorderPane root = new BorderPane();
 		
+		topPane_.setPadding(new Insets(10d));
+		topPane_.setAlignment(Pos.CENTER);
+		topPane_.getChildren().add(addNewWidgetMenu);
+		root.setTop(topPane_);
 		
 		mainCanvas__ = new AnchorPane();
 		mainCanvas__.setPadding(new Insets(50d));
 		mainCanvas__.getChildren().add(speakerWidget);
 		root.setCenter(mainCanvas__);
 		
-		VBox rightPane = new VBox();
-		rightPane.setPadding(new Insets(50d));
-		rightPane.getChildren().add(addSineWaveWidgetButton);
-		rightPane.getChildren().add(addCosineWaveWidgetButton);
-		rightPane.getChildren().add(addSquareWaveWidgetButton);
-		rightPane.getChildren().add(addWhiteNoiseWidgetButton);
-		rightPane.getChildren().add(addSawToothWaveWidgetButton);
-		rightPane.setSpacing(20.0);
-		
-		root.setRight(rightPane);
-		
 		HBox bottomPane = new HBox();
 		bottomPane.setAlignment(Pos.CENTER);
 		bottomPane.getChildren().add(playAudioButton);
 		bottomPane.setPadding(new Insets(20));
 		root.setBottom(bottomPane);
-		
 		
 		Scene scene = new Scene(root, 1000, 800);
 		stage.setScene(scene);
@@ -97,5 +85,12 @@ public class SynthesizeApplication extends Application {
 	}
 	
 	private static AnchorPane mainCanvas__ = new AnchorPane();
+	
+	private static HBox topPane_ = new HBox();
+	
+	public static HBox getTopPane()
+	{
+		return topPane_;
+	}
 	
 }
