@@ -1,0 +1,22 @@
+body {
+  text-align: center;
+}
+
+table,
+th,
+td {
+  border: 1px solid;
+  text-align: center;
+}
+
+table {
+  margin: 2rem auto;
+}
+
+.highlighted {
+  background-color: yellow;
+}
+
+.clicked {
+  background-color: red;
+}
