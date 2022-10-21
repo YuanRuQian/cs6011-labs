@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Calculator</title>
+</head>
+
+<body>
+    <h1>Calculator</h1>
+    <h2>Press the Calculate with Web Socket button or Enter key to calculate the result with web socket</h2>
+    <h2>Press the Calculate with Ajax button or Shift key to calculate the result with Ajax</h2>
+    <label for="XValue">X value:</label>
+    <input type="text" inputmode="numeric" pattern="\d*" id="XValue" name="XValue" value="0"><br>
+    <label for="YValue">Y value:</label>
+    <input type="text" inputmode="numeric" pattern="\d*" id="YValue" name="YValue" value="0"><br>
+    <div>
+    <button id="web-socket-button">Calculate with Web Socket</button>
+    <button id="ajax-button">Calculate with Ajax</button>
+    </div>
+    <br>
+    <label id="result-container"></label>
+    <script src="script.js"></script>
+</body>
+
+</html>
