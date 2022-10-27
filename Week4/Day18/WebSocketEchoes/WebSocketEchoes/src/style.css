@@ -1,0 +1,54 @@
+h1 {
+  text-align: center;
+}
+
+#basic-info-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+#basic-info-inputs div {
+  margin: auto;
+}
+
+#message-board {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+#people-list,
+#message-list {
+  border: 1px solid black;
+  padding: 1rem;
+}
+
+#message-board h2,
+h3 {
+  text-align: center;
+}
+
+#message-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#message-queue {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+#message-queue > div {
+  padding: 1rem;
+}
+
+#message-input {
+  width: 80%;
+  text-align: center;
+  line-height: 2rem;
+  height: 2rem;
+}

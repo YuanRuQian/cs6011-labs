@@ -1,0 +1,127 @@
+.App {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: powderblue;
+    line-height: 1;
+    margin: 2rem;
+}
+
+.profile-info {
+    text-align: left;
+    padding: 1rem 1rem 1rem 2rem;
+    border: 2px solid;
+    border-radius: 1rem;
+}
+
+.profile-pic {
+    height: 10rem;
+    pointer-events: none;
+    filter: invert(1);
+}
+
+.profile-link {
+    color: powderblue;
+}
+
+.profile-link:hover {
+    color: white;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .profile-pic {
+        animation: profile-pic-spin infinite 20s linear;
+    }
+}
+
+@keyframes profile-pic-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+body {
+    background: #b92b27; /* fallback for old browsers */
+    background: -webkit-linear-gradient(
+            to right,
+            #1565c0,
+            #b92b27
+    ); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(
+            to right,
+            #1565c0,
+            #b92b27
+    ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+body {
+    background: #b92b27;
+    background: linear-gradient(90deg, #1565c0, #b92b27)
+}
+
+.App {
+    align-items: center;
+    color: #b0e0e6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1;
+    margin: 2rem;
+    text-align: center
+}
+
+.profile-info {
+    border: 2px solid;
+    border-radius: 1rem;
+    padding: 1rem 1rem 1rem 2rem;
+    text-align: left
+}
+
+.profile-pic {
+    height: 10rem;
+    pointer-events: none
+}
+
+.profile-link {
+    color: #b0e0e6
+}
+
+.profile-link:hover {
+    color: #fff
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .profile-pic {
+        -webkit-animation: profile-pic-spin 20s linear infinite;
+        animation: profile-pic-spin 20s linear infinite
+    }
+}
+
+@-webkit-keyframes profile-pic-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg)
+    }
+    to {
+        -webkit-transform: rotate(1turn);
+        transform: rotate(1turn)
+    }
+}
+
+@keyframes profile-pic-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg)
+    }
+    to {
+        -webkit-transform: rotate(1turn);
+        transform: rotate(1turn)
+    }
+}
+
+/*# sourceMappingURL=main.e7490b6b.css.map*/
