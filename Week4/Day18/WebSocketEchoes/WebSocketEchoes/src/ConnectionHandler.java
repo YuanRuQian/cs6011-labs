@@ -1,11 +1,10 @@
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 
 public class ConnectionHandler implements Runnable {
-	private Socket socket;
+	private final Socket socket;
 	
 	public ConnectionHandler(Socket socket) {
 		this.socket = socket;
@@ -23,14 +22,20 @@ public class ConnectionHandler implements Runnable {
 					InputStream inputStream  = socket.getInputStream();
 					DataInputStream dataInputStream = new DataInputStream(inputStream);
 					String wsRequest = WebSocketTools.getRequest(dataInputStream);
+					if(wsRequest.equals("close"))
+					{
+						socket.close();
+						break;
+					}
 					System.out.println("Get incoming request: " + wsRequest);
 					WebSocketTools.handleResponse(socket, wsRequest);
 				} catch (IOException e) {
+					// this will happen if the browser closes...
 					throw new RuntimeException(e);
 				}
 			}
 		} else {
-			// if it is a HTTP request, just send back the response
+			// if it is an HTTP request, just send back the response
 			HTTPResponse response = new HTTPResponse(socket, request);
 			response.handleResponse();
 			try {

@@ -11,9 +11,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WebSocketToolsTest {
-	
 	@Test
-	void testGetWebSocketResponseKey() throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	void testGetWebSocketResponseKey() throws NoSuchAlgorithmException {
 		String requestKey = "dGhlIHNhbXBsZSBub25jZQ==";
 		String expectedResponseKey = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=";
 		String actualResponseKey = WebSocketTools.getWebSocketResponseKey(requestKey);

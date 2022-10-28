@@ -8,7 +8,7 @@ public class HTTPResponse {
 	private final String fileName;
 	private final String httpVersion;
 	private final Request request;
-	private final String fallback404PageFileName = "/404Page.html";
+	private final String fallback404PageFileName = "404Page.html";
 	
 	public HTTPResponse(Socket s, Request request) {
 		socket = s;
@@ -57,7 +57,7 @@ public class HTTPResponse {
 	
 	private void write404fallbackPage() {
 		try {
-			FileInputStream fileInputStream = new FileInputStream(request.getFilePath(fileName));
+			new FileInputStream(request.getFilePath(fileName));
 		} catch (FileNotFoundException e) {
 			try {
 				FileWriter fileWriter = new FileWriter(request.getFilePath(fallback404PageFileName));

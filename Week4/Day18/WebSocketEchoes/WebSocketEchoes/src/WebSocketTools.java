@@ -19,7 +19,7 @@ public class WebSocketTools {
 	
 	
 	public static boolean isWebSocket(Map<String, String> requestHeader) {
-		return requestHeader.containsKey("Upgrade") && requestHeader.get("Upgrade").equals("websocket");
+		return requestHeader.containsKey("Upgrade") && requestHeader.get("Upgrade").equals("websocket") && requestHeader.containsKey("Sec-WebSocket-Key");
 	}
 	
 	private static boolean isMasked(ArrayList<Byte> message) {
@@ -57,7 +57,7 @@ public class WebSocketTools {
 		return results;
 	}
 	
-	public static byte[] getResponseFrame(String response) throws UnsupportedEncodingException {
+	public static byte[] getResponseFrame(String response) {
 		byte[] payload = response.getBytes(StandardCharsets.UTF_8);
 		int payloadLength = payload.length;
 		ArrayList<Byte> responseFrame = new ArrayList<>();
@@ -122,6 +122,7 @@ public class WebSocketTools {
 			incomingBytes.add(dataInputStream.readByte());
 		}
 		boolean isMasked = isMasked(incomingBytes);
+		boolean isClosingFrame = isClosingFrame(incomingBytes);
 		int byte1PayloadLength = incomingBytes.get(1) & 0x7f;
 		int payloadLength = 0;
 		int payloadStart;
@@ -157,7 +158,16 @@ public class WebSocketTools {
 		for (int i = 0; i < payloadLength; i++) {
 			incomingBytes.add(dataInputStream.readByte());
 		}
+		if(isClosingFrame)
+		{
+			return "close";
+		}
 		return getWebSocketResponsePayload(incomingBytes, payloadStart, payloadLength);
+	}
+	
+	private static boolean isClosingFrame(ArrayList<Byte> incomingBytes) {
+		// OPCODE 8 : CLOSE
+		return (incomingBytes.get(0) & 0x0f) == 8;
 	}
 	
 	public static void sendResponse(String response, Socket socket) throws IOException {
@@ -168,48 +178,98 @@ public class WebSocketTools {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
+		assert out != null;
 		out.write(getResponseFrame(response));
 	}
+	
+	
 	
 	private static Map<String, String> getResponseJSON(String request) {
 		String[] incomingRequests = request.split("\s");
 		String type = incomingRequests[0];
 		Map<String, String> responseJSON = new HashMap<>();
 		switch (type) {
-			case "join":
+			case "join" -> {
 				responseJSON.put("type", "join");
 				responseJSON.put("user", incomingRequests[1]);
 				responseJSON.put("room", incomingRequests[2]);
-				break;
-			case "leave":
+			}
+			case "leave" -> {
 				responseJSON.put("type", "leave");
 				responseJSON.put("user", incomingRequests[1]);
 				responseJSON.put("room", incomingRequests[2]);
-				break;
-			default:
+			}
+			case "close" -> responseJSON.put("type", "close");
+			default -> {
+				String user2 = incomingRequests[0];
+				Room room2 = Room.getRoomByUser(user2);
+				String message = request.substring(user2.length() + 1).trim().replaceAll("\\s{2,}", "\n");
 				responseJSON.put("type", "message");
-				responseJSON.put("message", "message");
+				responseJSON.put("user", user2);
+				responseJSON.put("room", room2.getRoomName());
+				responseJSON.put("message", message);
+			}
 		}
 		return responseJSON;
 	}
 	
 	public static String stringifyJSON(Map<String, String> json) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		int i = 0;
 		for (String key : json.keySet()) {
-			result += "\"" + key + "\":" + "\"" + json.get(key) + "\"";
+			result.append("\"").append(key).append("\":").append("\"").append(json.get(key)).append("\"");
 			i++;
 			if (i < json.size()) {
-				result += ",";
+				result.append(",");
 			}
 		}
 		return "{" + result + "}";
 	}
 	
-	public static void handleResponse(Socket socket, String request) throws IOException {
-		Map<String, String> responseJSON = getResponseJSON(request);
-		String JSONString = stringifyJSON(responseJSON);
-		sendResponse(JSONString, socket);
+	private static void handleJoin(Map<String, String> responseJSON, Socket socket)
+	{
+		Room room = Room.getRoom(responseJSON.get("room"));
+		room.addUser(responseJSON.get("user"));
+		room.addSocket(socket);
 	}
 	
+	private static void handleLeave(Map<String, String> responseJSON, Socket socket)
+	{
+		Room room = Room.getRoom(responseJSON.get("room"));
+		room.removeUser(responseJSON.get("user"));
+		room.removeSocket(socket);
+	}
+	
+	public static void broadcastResponse(Map<String, String> responseJSON, Socket socket) throws IOException {
+		String JSONString = stringifyJSON(responseJSON);
+		Room room = Room.getRoom(responseJSON.get("room"));
+		Set<Socket> clients = room.getActiveSockets();
+		System.out.println("active clients length: " + clients.size());
+		if(Objects.equals(responseJSON.get("type"), "join"))
+		{
+			// send all past messages to the new joined client
+			ArrayList<Map<String, String>> messageQueue = room.getMessageQueue();
+			for (int i=0; i<messageQueue.size()-1; i++)
+			{
+				sendResponse(WebSocketTools.stringifyJSON(messageQueue.get(i)), socket);
+			}
+		}
+		for (Socket client: clients) {
+			sendResponse(JSONString, client);
+		}
+	}
+	
+	public static void handleResponse(Socket socket, String request) throws IOException {
+		Map<String, String> responseJSON = getResponseJSON(request);
+		String type = responseJSON.get("type");
+		System.out.println("handle response type: " + type);
+		String roomName = responseJSON.get("room");
+		Room room = Room.getRoom(roomName);
+		room.addMessage(responseJSON);
+		switch (type) {
+			case "join" -> handleJoin(responseJSON, socket);
+			case "leave" -> handleLeave(responseJSON, socket);
+		}
+		broadcastResponse(responseJSON, socket);
+	}
 }

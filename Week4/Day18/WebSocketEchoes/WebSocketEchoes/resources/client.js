@@ -36,24 +36,23 @@ const addUserNameListItem = (user) => {
     peopleListContent.appendChild(userNameListItem)
 }
 
-const addNewUser = (user) => {
-    peopleListData.add(user)
+const updatePeopleList = () =>
+{
     peopleListContent.innerHTML = ""
     const peopleList = Array.from(peopleListData)
     peopleList.forEach(addUserNameListItem)
     updatePeopleCounter()
 }
 
+
+const addNewUser = (user) => {
+    peopleListData.add(user)
+    updatePeopleList()
+}
+
 const removeUser = (user) => {
     peopleListData.delete(user)
-    peopleListContent.innerHTML = ""
-    const peopleList = Array.from(peopleListData)
-    peopleList.forEach(name => {
-        const userNameListItem = document.createElement("li")
-        userNameListItem.textContent = name
-        peopleListContent.appendChild(userNameListItem)
-    })
-    peopleCounter.textContent = `${peopleList.length} Online User${peopleList.length > 1 ? 's' : ''}`
+    updatePeopleList()
 }
 
 const getUserNameInputValue = () => userNameInput.value
@@ -94,10 +93,7 @@ const checkIfUserCanSendMessage = () => {
     if (!checkIfUserCanJoinRoom()) {
         return false
     }
-    if (!isMessageInputValueValid()) {
-        return false
-    }
-    return true
+    return isMessageInputValueValid()
 }
 
 const isCurrentUser = (user) => {
@@ -187,7 +183,7 @@ window.onbeforeunload = function () {
     alert('yes');
 };
 
-const handleWindowClose = (event) => {
+const handleWindowClose = () => {
     if (isWebSocketOpen) {
         socket.send(`leave ${getUserNameInputValue()} ${getRoomNameInputValue()}`)
     }
@@ -196,7 +192,12 @@ const handleWindowClose = (event) => {
     }
 }
 
-window.onclose = handleWindowClose
+window.onbeforeunload = () => {
+    // disable onclose handler first
+    socket.onclose = () => {}
+    handleWindowClose()
+    socket.close()
+}
 
 const updateUIAfterLoggingIn = () => {
     isLoggedIn = true
@@ -210,10 +211,6 @@ const clearMessageAndFocus = () => {
     messageInput.focus()
 }
 
-
-
-
-
 const displayEmptyMessageListTip = () => {
     const emptyMessageListTip = document.createElement('div')
     emptyMessageListTip.textContent = "No message history."
@@ -224,7 +221,6 @@ const displayEmptyMessageListTip = () => {
 }
 
 const handleMessage = (serverMessage) => {
-    console.log(serverMessage)
     const data = JSON.parse(serverMessage.data)
     const { type, room, user, message } = data
     addNewMessage(type, room, user, message)
@@ -243,12 +239,12 @@ const handleError = (error) => {
     console.error(error)
 }
 
-const handleClose = (event) => {
+const handleClose = () => {
     console.log("web socket is close")
     isWebSocketOpen = false
 }
 
-const handleOpen = (event) => {
+const handleOpen = () => {
     console.log("web socket is open")
     isWebSocketOpen = true
 }
@@ -279,7 +275,7 @@ const getRandomUserName = () => {
 
 const getDefaultRoomName = () => "room42"
 
-window.onload = (event) => {
+window.onload = () => {
     setupWebSocket()
     updatePeopleCounter()
     displayEmptyMessageListTip()

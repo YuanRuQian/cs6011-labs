@@ -1,8 +1,8 @@
-import javax.management.RuntimeErrorException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -23,7 +23,7 @@ public class Request {
 	}
 	
 	public String getFilePath(String fn) {
-		return "src" + fn;
+		return "resources/" + fn;
 	}
 	
 	private void checkIfFileExists() {
@@ -85,7 +85,8 @@ public class Request {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		Scanner requestHeaderScanner = new Scanner(requestStream, "UTF-8");
+		assert requestStream != null;
+		Scanner requestHeaderScanner = new Scanner(requestStream, StandardCharsets.UTF_8);
 		if (requestHeaderScanner.hasNextLine()) {
 			readRequestHeader(requestHeaderScanner);
 		}
