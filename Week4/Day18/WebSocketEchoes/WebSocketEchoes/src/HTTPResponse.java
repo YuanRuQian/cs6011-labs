@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 
+// send a HTTP response
 public class HTTPResponse {
 	private final Socket socket;
 	private final Boolean isFileValid;
@@ -127,5 +128,4 @@ public class HTTPResponse {
 	public void handleResponse() {
 		sendResponse(socket);
 	}
-	
 }

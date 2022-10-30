@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+// read & parse incoming requests
 public class Request {
 	private final Socket socket;
 	private final Map<String, String> requestHeader = new HashMap<>();

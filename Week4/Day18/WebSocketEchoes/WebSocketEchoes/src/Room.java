@@ -1,6 +1,9 @@
+import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
 
+// manage global room states
+// track active users & sockets of certain room
 public class Room {
 	private final String roomName;
 	private final Set<String> activeUsers;
@@ -8,11 +11,20 @@ public class Room {
 	private static final Set<Room> roomSet = new HashSet<>();
 	private final ArrayList<Map<String, String>> messageQueue;
 	
-	Room(String roomName) {
+	Room(String roomName) throws IOException {
 		this.roomName = roomName;
 		activeUsers = new HashSet<>();
 		activeSockets = new HashSet<>();
 		messageQueue = new ArrayList<>();
+		readMessageQueueFromMemory();
+	}
+	
+	private void readMessageQueueFromMemory() throws IOException {
+		ArrayList<String> messageStrings = PersistentMemoryTools.getMessageHistoryOfRoom(roomName);
+		for (String messageString: messageStrings) {
+			Map<String, String> json = WebSocketTools.parseJSON(messageString);
+			messageQueue.add(json);
+		}
 	}
 	
 	
@@ -30,7 +42,7 @@ public class Room {
 		return false;
 	}
 	
-	public static synchronized Room getRoom(String roomName) {
+	public static synchronized Room getRoom(String roomName) throws IOException {
 		if(hasRoom(roomName))
 		{
 			for (Room room : roomSet) {
@@ -47,6 +59,10 @@ public class Room {
 	
 	public synchronized void addUser(String user)
 	{
+		if(activeUsers.contains(user))
+		{
+			throw new RuntimeException("User already joined the room!");
+		}
 		System.out.println("add user: " + user);
 		activeUsers.add(user);
 	}
@@ -90,16 +106,18 @@ public class Room {
 		throw new RuntimeException("User " + user +" is not in any room!");
 	}
 	
-	// TODO: handle new line in message correctly so client could parse the JSON
-	// TODO: fix long length exception
-	public synchronized void addMessage(Map<String, String> message)
-	{
+	public synchronized void addMessage(Map<String, String> message) throws IOException {
 		System.out.println("add message: " + WebSocketTools.stringifyJSON(message));
 		messageQueue.add(message);
+		PersistentMemoryTools.addMessageToMemoryFile(message);
 	}
 	
 	public synchronized ArrayList<Map<String, String>> getMessageQueue()
 	{
 		return messageQueue;
+	}
+	
+	public boolean canAddUser(String user) {
+		return !activeUsers.contains(user);
 	}
 }

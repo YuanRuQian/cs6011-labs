@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+// read websocket requests & send websocket responses
 public class WebSocketTools {
 	private static final String magicString = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 	
@@ -27,17 +28,17 @@ public class WebSocketTools {
 	}
 	
 	
-	public static String getWebSocketResponsePayload(ArrayList<Byte> message, int payloadStart, int payloadLength) {
+	public static String getWebSocketResponsePayload(ArrayList<Byte> message, long payloadStart, long payloadLength) {
 		boolean isMasked = isMasked(message);
-		byte[] payload = new byte[payloadLength];
+		byte[] payload = new byte[(int) payloadLength];
 		for (int i = 0; i < payloadLength; i++) {
-			payload[i] = message.get(i + payloadStart);
+			payload[i] = message.get((int) (i + payloadStart));
 		}
 		if (isMasked) {
 			// decode the masked message
 			byte[] masks = new byte[4];
 			for (int i = 0; i < 4; i++) {
-				masks[i] = message.get(i + payloadStart - 4);
+				masks[i] = message.get((int) (i + payloadStart - 4));
 			}
 			for (int i = 0; i < payloadLength; i++) {
 				payload[i] = (byte) (payload[i] ^ masks[i % 4]);
@@ -46,9 +47,10 @@ public class WebSocketTools {
 		return new String(payload, StandardCharsets.UTF_8);
 	}
 	
-	private static ArrayList<Byte> getBytesFromNumber(int number) {
+	private static ArrayList<Byte> getBytesFromNumber(int number, int length) {
 		ArrayList<Byte> results = new ArrayList<>();
-		while (number > 0) {
+		for(int i=0; i<length; i++)
+		{
 			byte current = (byte) (number & 0xff);
 			number = number >> 8;
 			results.add(current);
@@ -64,18 +66,18 @@ public class WebSocketTools {
 		// FIN / RSV*3 / OPCODE
 		byte firstByte = (byte) 0x81;
 		responseFrame.add(firstByte);
-		if (payloadLength <= 0x7f) {
+		if (payloadLength <= 125) {
 			byte secondByte = (byte) payloadLength;
 			responseFrame.add(secondByte);
 		} else if (payloadLength <= 0xffff) {
 			byte secondByte = 126;
 			responseFrame.add(secondByte);
-			ArrayList<Byte> lengthBytes = getBytesFromNumber(payloadLength);
+			ArrayList<Byte> lengthBytes = getBytesFromNumber(payloadLength, 2);
 			responseFrame.addAll(lengthBytes);
 		} else {
 			byte secondByte = 127;
 			responseFrame.add(secondByte);
-			ArrayList<Byte> lengthBytes = getBytesFromNumber(payloadLength);
+			ArrayList<Byte> lengthBytes = getBytesFromNumber(payloadLength, 8);
 			responseFrame.addAll(lengthBytes);
 		}
 		for (byte p :
@@ -124,7 +126,7 @@ public class WebSocketTools {
 		boolean isMasked = isMasked(incomingBytes);
 		boolean isClosingFrame = isClosingFrame(incomingBytes);
 		int byte1PayloadLength = incomingBytes.get(1) & 0x7f;
-		int payloadLength = 0;
+		long payloadLength;
 		int payloadStart;
 		if (byte1PayloadLength < 126) {
 			// payload length in byte 1
@@ -132,18 +134,22 @@ public class WebSocketTools {
 			payloadStart = 2;
 		} else if (byte1PayloadLength == 126) {
 			// extended payload length in byte 2 ~ 3
-			// read next 2 bytes
-			for (int i = 2; i <= 3; i++) {
-				incomingBytes.add(dataInputStream.readByte());
-				payloadLength = (payloadLength << 8) | incomingBytes.get(i);
+			// read next 2 bytes / 1 short
+			payloadLength = dataInputStream.readShort();
+			short currentPayloadLength = (short) payloadLength;
+			for (int i = 0; i < 2; i++) {
+				incomingBytes.add((byte) (currentPayloadLength & 0xff));
+				currentPayloadLength = (short) (currentPayloadLength >> 8);
 			}
 			payloadStart = 4;
 		} else {
 			// extended payload length in byte 2 ~ 9
-			// read next 8 bytes
-			for (int i = 2; i <= 9; i++) {
-				incomingBytes.add(dataInputStream.readByte());
-				payloadLength = (payloadLength << 8) | incomingBytes.get(i);
+			// read next 8 bytes / 1 long
+			payloadLength = dataInputStream.readLong();
+			long currentPayloadLength = payloadLength;
+			for (int i = 0; i < 8; i++) {
+				incomingBytes.add((byte) (currentPayloadLength & 0xff));
+				currentPayloadLength = (short) (currentPayloadLength >> 8);
 			}
 			payloadStart = 10;
 		}
@@ -158,8 +164,7 @@ public class WebSocketTools {
 		for (int i = 0; i < payloadLength; i++) {
 			incomingBytes.add(dataInputStream.readByte());
 		}
-		if(isClosingFrame)
-		{
+		if (isClosingFrame) {
 			return "close";
 		}
 		return getWebSocketResponsePayload(incomingBytes, payloadStart, payloadLength);
@@ -171,6 +176,7 @@ public class WebSocketTools {
 	}
 	
 	public static void sendResponse(String response, Socket socket) throws IOException {
+		System.out.println("send response: " + response);
 		OutputStream out = null;
 		try {
 			out = socket.getOutputStream();
@@ -183,7 +189,6 @@ public class WebSocketTools {
 	}
 	
 	
-	
 	private static Map<String, String> getResponseJSON(String request) {
 		String[] incomingRequests = request.split("\s");
 		String type = incomingRequests[0];
@@ -193,18 +198,23 @@ public class WebSocketTools {
 				responseJSON.put("type", "join");
 				responseJSON.put("user", incomingRequests[1]);
 				responseJSON.put("room", incomingRequests[2]);
+				responseJSON.put("timestamp", incomingRequests[3]);
 			}
 			case "leave" -> {
 				responseJSON.put("type", "leave");
 				responseJSON.put("user", incomingRequests[1]);
 				responseJSON.put("room", incomingRequests[2]);
+				responseJSON.put("timestamp", incomingRequests[3]);
 			}
 			case "close" -> responseJSON.put("type", "close");
 			default -> {
 				String user2 = incomingRequests[0];
+				String timestamp = incomingRequests[1];
 				Room room2 = Room.getRoomByUser(user2);
-				String message = request.substring(user2.length() + 1).trim().replaceAll("\\s{2,}", "\n");
+				// JSON.parse() error prevention
+				String message = request.substring(user2.length() + 1 + timestamp.length() + 1).trim().replaceAll("[\\r\\n]", "[newline]");
 				responseJSON.put("type", "message");
+				responseJSON.put("timestamp", timestamp);
 				responseJSON.put("user", user2);
 				responseJSON.put("room", room2.getRoomName());
 				responseJSON.put("message", message);
@@ -226,15 +236,13 @@ public class WebSocketTools {
 		return "{" + result + "}";
 	}
 	
-	private static void handleJoin(Map<String, String> responseJSON, Socket socket)
-	{
+	private static void handleJoin(Map<String, String> responseJSON, Socket socket) throws IOException {
 		Room room = Room.getRoom(responseJSON.get("room"));
 		room.addUser(responseJSON.get("user"));
 		room.addSocket(socket);
 	}
 	
-	private static void handleLeave(Map<String, String> responseJSON, Socket socket)
-	{
+	private static void handleLeave(Map<String, String> responseJSON, Socket socket) throws IOException {
 		Room room = Room.getRoom(responseJSON.get("room"));
 		room.removeUser(responseJSON.get("user"));
 		room.removeSocket(socket);
@@ -245,16 +253,14 @@ public class WebSocketTools {
 		Room room = Room.getRoom(responseJSON.get("room"));
 		Set<Socket> clients = room.getActiveSockets();
 		System.out.println("active clients length: " + clients.size());
-		if(Objects.equals(responseJSON.get("type"), "join"))
-		{
+		if (Objects.equals(responseJSON.get("type"), "join")) {
 			// send all past messages to the new joined client
 			ArrayList<Map<String, String>> messageQueue = room.getMessageQueue();
-			for (int i=0; i<messageQueue.size()-1; i++)
-			{
+			for (int i = 0; i < messageQueue.size() - 1; i++) {
 				sendResponse(WebSocketTools.stringifyJSON(messageQueue.get(i)), socket);
 			}
 		}
-		for (Socket client: clients) {
+		for (Socket client : clients) {
 			sendResponse(JSONString, client);
 		}
 	}
@@ -262,14 +268,41 @@ public class WebSocketTools {
 	public static void handleResponse(Socket socket, String request) throws IOException {
 		Map<String, String> responseJSON = getResponseJSON(request);
 		String type = responseJSON.get("type");
-		System.out.println("handle response type: " + type);
 		String roomName = responseJSON.get("room");
 		Room room = Room.getRoom(roomName);
-		room.addMessage(responseJSON);
-		switch (type) {
-			case "join" -> handleJoin(responseJSON, socket);
-			case "leave" -> handleLeave(responseJSON, socket);
+		if (type.equals("join")) {
+			if (room.canAddUser(responseJSON.get("user"))) {
+				handleJoin(responseJSON, socket);
+			} else {
+				// if there is already a user with the same name in the same room, send back an error message
+				handleDuplicateUserError(responseJSON, socket);
+				return;
+			}
+		} else if (type.equals("leave")) {
+			handleLeave(responseJSON, socket);
 		}
+		room.addMessage(responseJSON);
 		broadcastResponse(responseJSON, socket);
+	}
+	
+	private static void handleDuplicateUserError(Map<String, String> responseJSON, Socket socket) throws IOException {
+		Map<String, String> json = new HashMap<>();
+		json.put("type", "error");
+		json.put("error", "There is someone called " + responseJSON.get("user") + " in " + responseJSON.get("room") + "! Please choose a different user name.");
+		String jsonString = stringifyJSON(json);
+		sendResponse(jsonString, socket);
+	}
+	
+	public static Map<String, String> parseJSON(String str) {
+		Map<String, String> json = new HashMap<>();
+		String trimStr = str.substring(1, str.length() - 1);
+		String[] keyValuePairs = trimStr.split(",");
+		for (String keyValuePair : keyValuePairs) {
+			String[] keyAndValue = keyValuePair.split(":");
+			String key = keyAndValue[0].substring(1, keyAndValue[0].length() - 1);
+			String value = keyAndValue[1].substring(1, keyAndValue[1].length() - 1);
+			json.put(key, value);
+		}
+		return json;
 	}
 }

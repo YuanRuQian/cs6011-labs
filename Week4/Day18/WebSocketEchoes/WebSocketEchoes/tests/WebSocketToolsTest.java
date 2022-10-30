@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ class WebSocketToolsTest {
 		
 		// 256 bytes binary message in a single unmasked frame
 		byte[] test3bytes = new byte[256 + 4];
-		test3bytes[0] = (byte) 0x83;
+		test3bytes[0] = (byte) 0x81;
 		test3bytes[1] = 0x7E;
 		test3bytes[2] = 0x01;
 		test3bytes[3] = 0x00;
@@ -50,10 +51,9 @@ class WebSocketToolsTest {
 		assertEquals (payload3, WebSocketTools.getRequest(new DataInputStream(test3)));
 		
 		
-		
 		// 64 KiB binary message in a single unmasked frame
 		byte[] test4bytes = new byte[10 + 65536];
-		test4bytes[0] = (byte) 0x82;
+		test4bytes[0] = (byte) 0x81;
 		test4bytes[1] = 0x7F;
 		for(int i=2; i<2+5; i++)
 		{
@@ -80,4 +80,17 @@ class WebSocketToolsTest {
 		assertEquals(expected, WebSocketTools.stringifyJSON(json));
 	}
 	
+	@Test
+	void testJSONParse()
+	{
+		Map<String, String> testJSON = new HashMap<>();
+		testJSON.put("type", "join");
+		testJSON.put("user", "Lydia");
+		testJSON.put("room", "room42");
+		testJSON.put("timestamp", "1667017937122");
+		String stringJSON = WebSocketTools.stringifyJSON(testJSON);
+		Map<String, String> newJSON = WebSocketTools.parseJSON(stringJSON);
+		assertArrayEquals(testJSON.keySet().toArray(), newJSON.keySet().toArray());
+		assertArrayEquals(testJSON.values().toArray(), newJSON.values().toArray());
+	}
 }

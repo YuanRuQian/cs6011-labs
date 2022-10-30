@@ -28,16 +28,14 @@ const getNamePrompt = (user) => {
 const addUserNameListItem = (user) => {
     const userNameListItem = document.createElement("li")
     userNameListItem.textContent = getNamePrompt(user)
-    if (isCurrentUser(user))
-    {
+    if (isCurrentUser(user)) {
         userNameListItem.style.color = "green"
         userNameListItem.style.fontWeight = "bold"
     }
     peopleListContent.appendChild(userNameListItem)
 }
 
-const updatePeopleList = () =>
-{
+const updatePeopleList = () => {
     peopleListContent.innerHTML = ""
     const peopleList = Array.from(peopleListData)
     peopleList.forEach(addUserNameListItem)
@@ -78,6 +76,9 @@ const isMessageInputValueValid = () => {
 }
 
 const checkIfUserCanJoinRoom = () => {
+    if (isLoggedIn) {
+        return false
+    }
     if (!isUserNameInputValueValid()) {
         alert("Please enter a user name with no spaces!")
         return false
@@ -90,71 +91,88 @@ const checkIfUserCanJoinRoom = () => {
 }
 
 const checkIfUserCanSendMessage = () => {
-    if (!checkIfUserCanJoinRoom()) {
-        return false
-    }
-    return isMessageInputValueValid()
+    return isLoggedIn && isMessageInputValueValid()
 }
 
 const isCurrentUser = (user) => {
     return user === getUserNameInputValue()
 }
 
-const updateDocumentTitle = (user) => {
+const updateDocumentTitle = (user, room) => {
     if (isCurrentUser(user)) {
-        document.title = `${getUserNameInputValue()}'s Chat Room`
+        document.title = `${getUserNameInputValue()}'s Chat Room: ${room}`
     }
 }
 
-const addJoinMessage = (user, newMessage) => {
+const addTimestampDiv = (time, parent) => {
+    const timestampDiv = document.createElement("div");
+    timestampDiv.style.fontWeight = "normal"
+    timestampDiv.style.fontSize = "x-small"
+    timestampDiv.style.textAlign = "right"
+    timestampDiv.style.marginTop = "4px"
+    timestampDiv.textContent = time
+    parent.appendChild(timestampDiv)
+}
+
+const addJoinMessage = (user, room, newMessage, time) => {
     if (!peopleListData.has(user)) {
         newMessage.textContent = `${user} enters the room`
         newMessage.style.color = "gray"
         newMessage.style.fontWeight = "bold"
         newMessage.style.borderColor = "gray"
         addNewUser(user)
-        updateDocumentTitle(user)
+        updateDocumentTitle(user, room)
+        addTimestampDiv(time, newMessage)
     }
 }
 
-const addLeaveMessage = (user, newMessage) => {
+const addLeaveMessage = (user, newMessage, time) => {
     if (peopleListData.has(user)) {
         newMessage.textContent = `${user} leaves the room`
         newMessage.style.color = "gray"
         newMessage.style.fontWeight = "bold"
         newMessage.style.borderColor = "gray"
         removeUser(user)
+        addTimestampDiv(time, newMessage)
     }
 }
 
-const addReceivedMessage = (user, newMessage, message) => {
+const stripHTMLTags = string => string.replace(/(<([^>]+)>)/gi, "")
+
+const addReceivedMessage = (user, newMessage, message, time) => {
     const isUserThemselves = isCurrentUser(user)
     if (isUserThemselves) {
         newMessage.style.color = "green"
         newMessage.style.border = "4px green solid"
     }
-    newMessage.textContent = `${getNamePrompt(user)}: ${message}`
+    console.log("before strip", message)
+    message = stripHTMLTags(message)
+    message = message.replace(/(\[newline\])/g, "<br>")
+    newMessage.innerHTML = `<p>${getNamePrompt(user)}: ${message}</p>`
+    addTimestampDiv(time, newMessage)
 }
 
-const addNewMessage = (type, room, user, message) => {
+const addNewMessage = (type, room, user, message, time) => {
     if (room !== getRoomNameInputValue()) {
         return
     }
     if (messageListData.length === 0) {
         messageQueue.innerHTML = ""
     }
-    messageListData.push({ type, room, user, message })
+    messageListData.push({type, room, user, message, time})
     const newMessage = document.createElement('div')
     newMessage.style.border = "2px black solid"
+    newMessage.style.display = "flex"
+    newMessage.style.flexDirection = "column"
     switch (type) {
         case 'join':
-            addJoinMessage(user, newMessage)
+            addJoinMessage(user, room, newMessage, time)
             break
         case 'leave':
-            addLeaveMessage(user, newMessage)
+            addLeaveMessage(user, newMessage, time)
             break
         case 'message':
-            addReceivedMessage(user, newMessage, message)
+            addReceivedMessage(user, newMessage, message, time)
             break
     }
     messageQueue.appendChild(newMessage)
@@ -166,13 +184,13 @@ const handleEnterKeyPress = (event) => {
     }
     if (isWebSocketOpen) {
         if (checkIfUserCanSendMessage()) {
-            socket.send(`${getUserNameInputValue()} ${getMessageInputValue()}`)
+            const timestamp = new Date().getTime()
+            socket.send(`${getUserNameInputValue()} ${timestamp} ${getMessageInputValue()}`)
+        } else if (checkIfUserCanJoinRoom()) {
+            const timestamp = new Date().getTime()
+            socket.send(`join ${getUserNameInputValue()} ${getRoomNameInputValue()} ${timestamp}`)
         }
-        else if (checkIfUserCanJoinRoom()) {
-            socket.send(`join ${getUserNameInputValue()} ${getRoomNameInputValue()}`)
-        }
-    }
-    else {
+    } else {
         alert("web socket is closed")
     }
 }
@@ -185,16 +203,18 @@ window.onbeforeunload = function () {
 
 const handleWindowClose = () => {
     if (isWebSocketOpen) {
-        socket.send(`leave ${getUserNameInputValue()} ${getRoomNameInputValue()}`)
-    }
-    else {
+        const timestamp = new Date().getTime()
+        socket.send(`leave ${getUserNameInputValue()} ${getRoomNameInputValue()} ${timestamp}`)
+    } else {
         alert("web socket is close")
     }
 }
 
+// disable onclose handler first
+// send leave message before the socket closes aka sending the closing frame (OPCODE: 8)
 window.onbeforeunload = () => {
-    // disable onclose handler first
-    socket.onclose = () => {}
+    socket.onclose = () => {
+    }
     handleWindowClose()
     socket.close()
 }
@@ -222,8 +242,15 @@ const displayEmptyMessageListTip = () => {
 
 const handleMessage = (serverMessage) => {
     const data = JSON.parse(serverMessage.data)
-    const { type, room, user, message } = data
-    addNewMessage(type, room, user, message)
+    let {type, room, user, message, timestamp, error} = data
+    if(type === "error")
+    {
+        alert(error)
+        return
+    }
+    const dateObj = new Date(Number(timestamp))
+    const time = `${dateObj.toLocaleDateString()} ${dateObj.toLocaleTimeString()}`
+    addNewMessage(type, room, user, message, time)
     switch (type) {
         case 'join':
             updateUIAfterLoggingIn()

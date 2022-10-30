@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
+// handle a connection ( read & parse request, send response )
+// wrap the connection handler logic in a thread
 public class ConnectionHandler implements Runnable {
 	private final Socket socket;
 	
@@ -30,7 +32,6 @@ public class ConnectionHandler implements Runnable {
 					System.out.println("Get incoming request: " + wsRequest);
 					WebSocketTools.handleResponse(socket, wsRequest);
 				} catch (IOException e) {
-					// this will happen if the browser closes...
 					throw new RuntimeException(e);
 				}
 			}
