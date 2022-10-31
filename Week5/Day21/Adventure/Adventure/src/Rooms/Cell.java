@@ -14,7 +14,7 @@ public class Cell extends Room {
 
     @Override
     public Room goThroughDoor(int doorNum) {
-
+        
         if( locked_ ) {
             System.out.println( "The door is locked!" );
             return null;
@@ -28,37 +28,48 @@ public class Cell extends Room {
     public void playerEntered() {
         if( locked_ ) {
             System.out.println( "You hear a clicking noise..." );
+            boolean hasKey = hasKey();
+            if(!hasKey)
+            {
+                Adventure.markTheGameAsDone();
+            }
         }
     }
 
     @Override
     public boolean handleCommand( String[] subcommands ) {
-
         if( subcommands.length <= 1 ) {
             return false;
         }
         String cmd  = subcommands[0];
         String attr = subcommands[1];
 
-        // unlock, use
-        if( cmd.equals( "unlock" ) && attr.equals( "door") ) {
-
-            boolean hasKey = false;
-            for( Item item : Adventure.inventory ) {
-                if( item.getName().equals( "Key" ) ) {
-                    hasKey = true;
-                    break;
-                }
-            }
-            if( hasKey ) {
-                System.out.println( "You unlock the door.");
-                locked_ = false;
-            }
-            else {
-                System.out.println( "You don't have a key." );
-            }
-            return true;
+        if( cmd.equals( "unlock" ) && attr.equals( "door")) {
+               return handleUnlockDoor();
         }
         return false;
+    }
+    
+    private boolean handleUnlockDoor() {
+        boolean hasKey = hasKey();
+        if( hasKey ) {
+            System.out.println( "You unlock the door.");
+            locked_ = false;
+        }
+        else {
+            System.out.println( "You don't have a key." );
+        }
+        return true;
+    }
+    
+    private boolean hasKey() {
+        boolean hasKey = false;
+        for( Item item : Adventure.inventory ) {
+            if( item.getName().equals( "Key" ) ) {
+                hasKey = true;
+                break;
+            }
+        }
+        return hasKey;
     }
 }
