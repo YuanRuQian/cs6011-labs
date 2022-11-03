@@ -2,13 +2,33 @@ package com.example.androidchat
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.MessageQueue
 import android.util.Log
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 
 class ChatRoomPage : AppCompatActivity() {
+    private lateinit var messageQueue: ListView
+
+    private fun testListView()
+    {
+        messageQueue = findViewById<ListView>(R.id.recipe_list_view)
+
+
+        val listItems = arrayOfNulls<String>(3)
+
+        for (i in 0 until 3) {
+            listItems[i] = i.toString()
+        }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listItems)
+        messageQueue.adapter = adapter
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chat_room_page)
@@ -20,6 +40,8 @@ class ChatRoomPage : AppCompatActivity() {
         // showing the back home button in action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setUpInfoDisplay()
+
+        testListView()
 
         val sendMessageBtn = findViewById<Button>(R.id.sendMessageBtn)
         sendMessageBtn.setOnClickListener {

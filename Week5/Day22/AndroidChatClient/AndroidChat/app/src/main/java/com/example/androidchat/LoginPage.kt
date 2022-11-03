@@ -1,4 +1,5 @@
 package com.example.androidchat
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -47,6 +48,8 @@ class LoginPage : AppCompatActivity() {
             GlobalStateManager.updateUserName(userName)
             GlobalStateManager.updateRoomName(roomName)
             HelperTools.sendJoinMessageToServer()
+            intent = Intent(applicationContext, ChatRoomPage::class.java)
+            startActivity(intent)
         }
     }
 

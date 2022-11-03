@@ -72,7 +72,5 @@ class GlobalStateManager : Application() {
         fun setLoggedInAsTrue() {
             isLoggedIn = true
         }
-
-
     }
 }

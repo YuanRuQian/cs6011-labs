@@ -6,13 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".ChatRoomPage">
 
-    <view
-        android:id="@+id/messageQueue"
-        class="androidx.appcompat.app.AlertController$RecycleListView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toTopOf="parent"></view>
+    <ListView
+        android:id="@+id/recipe_list_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/messageInput"

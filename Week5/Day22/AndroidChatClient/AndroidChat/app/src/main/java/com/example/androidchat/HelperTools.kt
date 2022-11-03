@@ -3,6 +3,8 @@ package com.example.androidchat
 import android.widget.Toast
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HelperTools {
     companion object {
@@ -57,6 +59,11 @@ class HelperTools {
             val jsonObj = JSONObject(string)
             return jsonObj.toMap()
         }
+
+        private val simpleDateFormat = SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.ENGLISH)
+
+        // "1667442594063" => 2022/11/02 08:29 PM
+        fun getDateString(time: Long) : String = simpleDateFormat.format(time)
     }
 }
 

@@ -1,11 +1,14 @@
 package com.example.androidchat
 
-import android.content.Intent
+import android.os.Build
 import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
+import androidx.annotation.RequiresApi
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.*
 
 class EchoWebSocketListener : WebSocketListener() {
     override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -19,17 +22,17 @@ class EchoWebSocketListener : WebSocketListener() {
         output("Receiving : $text")
         val json = HelperTools.getJSONFromString(text)
 
-        if(json["type"] == "error")
-        {
+        if (json["type"] == "error") {
             // TODO: alert error message
             // TODO: prevent log in
             GlobalStateManager.setLoggedInAsFalse()
-            HelperTools.showMessageToast(GlobalStateManager.getCurrentApplicationContext(),
+            HelperTools.showMessageToast(
+                GlobalStateManager.getCurrentApplicationContext(),
                 json["error"] as String
             )
         }
-        if(json["type"] == "join" && json["user"] == GlobalStateManager.getCurrentUserName())
-        {
+
+        if (json["type"] == "join" && json["user"] == GlobalStateManager.getCurrentUserName()) {
             GlobalStateManager.setLoggedInAsTrue()
             // TODO: login to chat room page
         }
@@ -45,10 +48,32 @@ class EchoWebSocketListener : WebSocketListener() {
     }
 
     companion object {
-        private val NORMAL_CLOSURE_STATUS = 1000
+        private const val NORMAL_CLOSURE_STATUS = 1000
     }
 
     private fun output(txt: String) {
         Log.i("WSS", txt)
+    }
+
+    private fun getJoinMessage(json: Map<String, *>): String {
+        val userName = json["user"]
+        return "$userName enters the room"
+    }
+
+    private fun getLeaveMessage(json: Map<String, *>): String {
+        val userName = json["user"]
+        return "$userName leaves the room"
+    }
+
+    private fun getUserSentMessage(json: Map<String, *>): String {
+        val userName = json["user"]
+        val messageContent = json["message"]
+        return "$userName: $messageContent"
+    }
+
+
+    private fun getTimeStampString(unixTimestamp: String): String {
+
+        return ""
     }
 }
