@@ -185,7 +185,7 @@ const handleEnterKeyPress = (event) => {
     if (isWebSocketOpen) {
         if (checkIfUserCanSendMessage()) {
             const timestamp = new Date().getTime()
-            socket.send(`${getUserNameInputValue()} ${timestamp} ${getMessageInputValue()}`)
+            socket.send(`${getUserNameInputValue()} ${getRoomNameInputValue()} ${timestamp} ${getMessageInputValue()}`)
         } else if (checkIfUserCanJoinRoom()) {
             const timestamp = new Date().getTime()
             socket.send(`join ${getUserNameInputValue()} ${getRoomNameInputValue()} ${timestamp}`)

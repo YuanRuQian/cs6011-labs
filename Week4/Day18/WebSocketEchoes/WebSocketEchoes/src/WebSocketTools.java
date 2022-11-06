@@ -209,14 +209,14 @@ public class WebSocketTools {
 			case "close" -> responseJSON.put("type", "close");
 			default -> {
 				String user2 = incomingRequests[0];
-				String timestamp = incomingRequests[1];
-				Room room2 = Room.getRoomByUser(user2);
+				String room2 = incomingRequests[1];
+				String timestamp = incomingRequests[2];
 				// JSON.parse() error prevention
-				String message = request.substring(user2.length() + 1 + timestamp.length() + 1).trim().replaceAll("[\\r\\n]", "[newline]");
+				String message = request.substring(user2.length() + 1 + room2.length() + 1 + timestamp.length() + 1).trim().replaceAll("[\\r\\n]", "[newline]");
 				responseJSON.put("type", "message");
 				responseJSON.put("timestamp", timestamp);
 				responseJSON.put("user", user2);
-				responseJSON.put("room", room2.getRoomName());
+				responseJSON.put("room", room2);
 				responseJSON.put("message", message);
 			}
 		}
@@ -289,6 +289,7 @@ public class WebSocketTools {
 		Map<String, String> json = new HashMap<>();
 		json.put("type", "error");
 		json.put("error", "There is someone called " + responseJSON.get("user") + " in " + responseJSON.get("room") + "! Please choose a different user name.");
+		json.put("timestamp", new String(String.valueOf(System.currentTimeMillis())));
 		String jsonString = stringifyJSON(json);
 		sendResponse(jsonString, socket);
 	}
