@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/purple_200"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="9dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+    <TextView
+        android:id="@+id/messageContent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/message_content"
+        android:textSize="20sp" />
+    <TextView
+        android:id="@+id/messageTimestamp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/message_timestamp"
+        android:textAlignment="viewEnd"
+        android:textSize="16sp" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

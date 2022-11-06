@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">AndroidChatClient</string>
+    <string name="send_message_btn">Send</string>
+    <string name="message_text_hint">Enter your message here …</string>
+    <string name="back_btn">Back</string>
+    <string name="messages_header">Message History</string>
+    <string name="user_name_hint">user name</string>
+    <string name="room_name_hint">room name</string>
+    <string name="login_btn">Log In</string>
+    <string name="app_debug_tag">AndroidChatClient</string>
+    <string name="message_content">message content</string>
+    <string name="message_timestamp">message timestamp</string>
+</resources>
